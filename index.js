@@ -1,6 +1,10 @@
 ﻿var allCountryName = [
-        'USD', 'HKD', 'GBP', 'AUD', 'CAD', 'SGD', 'CHF', 'JPY', 'ZAR', 'SEK',
-        'NZD', 'THB', 'PHP', 'IDR', 'EUR', 'KRW', 'VND', 'MYR', 'CNY'
+    'USD', 'HKD', 'GBP', 'AUD', 'CAD', 'SGD', 'CHF', 'JPY', 'ZAR', 'SEK',
+    'NZD', 'THB', 'PHP', 'IDR', 'EUR', 'KRW', 'VND', 'MYR', 'CNY'
+]
+var chineseCountryName = [
+        '美金', '港幣', '英鎊', '澳幣', '加拿大幣', '新加坡幣', '瑞士法郎', '日圓', '南非幣', '瑞典幣',
+        '紐元', '泰幣', '菲國比索', '印尼幣', '歐元', '韓元', '越南盾', '馬來幣', '人民幣'
     ]
     //讀進資料
 var entireHistoryData = []; //contains more than 1000 indices
@@ -421,7 +425,7 @@ d3.csv("history.csv", function(tmpdata) {
                                     return (scaleY(dividedCountryData[whichCountry][i].historyValue2) - offsetY);
                                 })
                                 .text(function(d) {
-                                    if (j == 0) return dividedCountryData[whichCountry][i].date + "(" + dividedCountryData[whichCountry][i].country + ")";
+                                    if (j == 0) return dividedCountryData[whichCountry][i].date + "(" + chineseCountryName[whichCountry] + dividedCountryData[whichCountry][i].country + ")";
                                     if (j == 1) return "現金買入 : " + dividedCountryData[whichCountry][i].historyValue1;
                                     if (j == 2) return "現金賣出 : " + dividedCountryData[whichCountry][i].historyValue2;
                                     if (j == 3) return "即期買入 : " + dividedCountryData[whichCountry][i].historyValue3;
@@ -654,9 +658,7 @@ d3.csv("history.csv", function(tmpdata) {
             .linear()
             .domain([1, PosNum])
             .range(['#FF5151', '#FFD2D2']);
-        // console.log(countryNegColor(5));
 
-        // console.log(NegNum);
         var PackDataset = [];
         //做單層就好，這邊直接設定children
         PackDataset[0] = { "children": NegcashBuyChange } //現金買入:跌-----
@@ -713,16 +715,6 @@ d3.csv("history.csv", function(tmpdata) {
                     cx: function(d) { return d.x + packSvgMarginLeft; }, // 用 x,y 當圓心
                     cy: function(d) { return d.y; },
                     r: function(d) { return 1 * d.r; }, // 用 r 當半徑
-                    fill: function(d, i) {
-                        //console.log(d.country, i, d.r);
-                        for (var x = 0; x < allCountryName.length; ++x) {
-                            if (d.country == allCountryName[x]) {
-                                // console.log(d.r);
-                                //console.log(d.country + x)
-                                return countryColor[x];
-                            }
-                        }
-                    },
                     id: function(d, i) {
                         // console.log(d, i);
                         // console.log("circlesOnSVG" + cnt + i);
@@ -791,10 +783,14 @@ d3.csv("history.csv", function(tmpdata) {
                     y: function(d) { return d.y; },
                     "text-anchor": "middle",
                 })
-                .text(function(d) {
-                    return d.country;
+                .text(function(d, i) {
+                    for (var w = 0; w < allCountryName.length; ++w) {
+                        if (d.country == allCountryName[w])
+                            return chineseCountryName[w]
+                    }
+                    //return d.country; //////////////////////////
                 })
-                .attr("font-family", "sans-serif")
+                .attr("font-family", "Noto Sans TC")
                 .attr("font-size", function(d, i) {
                     if (d.r > 50) return "20px";
                     else if (d.r > 25) return "12px";
@@ -915,64 +911,5 @@ d3.csv("history.csv", function(tmpdata) {
                 }
             }
         }
-        // for (var i = 0; i < NegcashBuyChange.length; ++i) {
-        //     for (var j = 0; j < NegcashBuyChange.length; ++j) {
-        //         if (d3.selectAll(".circlesOnSVG0")[0][j].__data__.country == NegcashBuyChange[i].country) {
-        //             d3.select("#circlesOnSVG0" + j).attr("fill", countryNegColor(i + 1));
-        //             // console.log(d3.selectAll(".circlesOnSVG0")[0][j].__data__.country);
-        //             // console.log(d3.select("#circlesOnSVG0" + j).attr("fill", countryNegColor(i + 1)));
-        //             // console.log(i);
-        //         }
-        //     }
-        // }
-        // for (var i = 0; i < NegcashSellChange.length; ++i) {
-        //     for (var j = 0; j < NegcashSellChange.length; ++j) {
-        //         if (d3.selectAll(".circlesOnSVG1")[0][j].__data__.country == NegcashSellChange[i].country) {
-        //             d3.select("#circlesOnSVG1" + j).attr("fill", countryNegColor(i + 1));
-        //         }
-        //     }
-        // }
-        // for (var i = 0; i < NegSightBuyChange.length; ++i) {
-        //     for (var j = 0; j < NegSightBuyChange.length; ++j) {
-        //         if (d3.selectAll(".circlesOnSVG2")[0][j].__data__.country == NegSightBuyChange[i].country) {
-        //             d3.select("#circlesOnSVG2" + j).attr("fill", countryNegColor(i + 1));
-        //         }
-        //     }
-        // }
-        // for (var i = 0; i < NegSightSellChange.length; ++i) {
-        //     for (var j = 0; j < NegSightSellChange.length; ++j) {
-        //         if (d3.selectAll(".circlesOnSVG3")[0][j].__data__.country == NegSightSellChange[i].country) {
-        //             d3.select("#circlesOnSVG3" + j).attr("fill", countryNegColor(i + 1));
-        //         }
-        //     }
-        // }
-        // for (var i = 0; i < PoscashBuyChange.length; ++i) {
-        //     for (var j = 0; j < PoscashBuyChange.length; ++j) {
-        //         if (d3.selectAll(".circlesOnSVG4")[0][j].__data__.country == PoscashBuyChange[i].country) {
-        //             d3.select("#circlesOnSVG4" + j).attr("fill", countryPosColor(i + 1));
-        //         }
-        //     }
-        // }
-        // for (var i = 0; i < PoscashSellChange.length; ++i) {
-        //     for (var j = 0; j < PoscashSellChange.length; ++j) {
-        //         if (d3.selectAll(".circlesOnSVG5")[0][j].__data__.country == PoscashSellChange[i].country) {
-        //             d3.select("#circlesOnSVG5" + j).attr("fill", countryPosColor(i + 1));
-        //         }
-        //     }
-        // }
-        // for (var i = 0; i < PosSightBuyChange.length; ++i) {
-        //     for (var j = 0; j < PosSightBuyChange.length; ++j) {
-        //         if (d3.selectAll(".circlesOnSVG6")[0][j].__data__.country == PosSightBuyChange[i].country) {
-        //             d3.select("#circlesOnSVG6" + j).attr("fill", countryPosColor(i + 1));
-        //         }
-        //     }
-        // }
-        // for (var i = 0; i < PosSightSellChange.length; ++i) {
-        //     for (var j = 0; j < PosSightSellChange.length; ++j) {
-        //         if (d3.selectAll(".circlesOnSVG7")[0][j].__data__.country == PosSightSellChange[i].country) {
-        //             d3.select("#circlesOnSVG7" + j).attr("fill", countryPosColor(i + 1));
-        //         }
-        //     }
-        // }
 
     }) //d3.csv
