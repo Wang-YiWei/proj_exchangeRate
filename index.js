@@ -39,6 +39,7 @@ d3.csv("history.csv", function(tmpdata) {
         var whichCountry = 0;
         var linechartWidth = screen.availWidth - $('.container1').width() - 30,
             linechartHeight = $('.container1').height();
+        $('#lineChart').height(screen.availHeight);
         // console.log($('.container1').width());
         // console.log(linechartWidth);
         // console.log(screen.availWidth);
@@ -466,8 +467,6 @@ d3.csv("history.csv", function(tmpdata) {
                 //設定跟著滑鼠跑的那條線從長度從y = 0 到畫布的最底
                 d3.select('#flexibleLine')
                     .style('opacity', function() {
-                        console.log();
-
                         if (mousePosOnLinechart[0] > (scaleX(dividedCountryData[whichCountry][0].x) + offsetX))
                             return 0;
                         if (mousePosOnLinechart[0] < scaleX(dividedCountryData[whichCountry][dividedCountryData[whichCountry].length - 1].x) + offsetX)
@@ -611,9 +610,9 @@ d3.csv("history.csv", function(tmpdata) {
             NegSightSellChange = [];
 
 
-        var countryColor = ["#680097", "#90B2E4", "#FFD464", "#F4806D", "#CCA8E9", "#D0F9B1", "#2DBA63", "#C244FB", "pink", "#FBE6A2",
-            "#E84A5F", "#368C72", "#FFC468", "#F7F7D1", "#466551", "#96D38C", "pink", "#96D38C", "pink"
-        ];
+        // var countryColor = ["#680097", "#90B2E4", "#FFD464", "#F4806D", "#CCA8E9", "#D0F9B1", "#2DBA63", "#C244FB", "pink", "#FBE6A2",
+        //     "#E84A5F", "#368C72", "#FFC468", "#F7F7D1", "#466551", "#96D38C", "pink", "#96D38C", "pink"
+        // ];
 
         for (var i = 0; i < allCountryName.length; ++i) {
             if (dividedCountryData[i][1].historyValue1 != 0 && (dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) != 0) {
@@ -650,266 +649,573 @@ d3.csv("history.csv", function(tmpdata) {
         var NegArr = [NegcashBuyChange.length, NegcashSellChange.length, NegSightBuyChange.length, NegSightSellChange.length];
         var NegNum = d3.max(NegArr);
 
+        var
+            deepColor1 = "#359768",
+            lightColor1 = "#CEFFCE",
+            deepColor2 = "#6465A5",
+            lightColor2 = "#d9d9f9";
+
         var countryNegColor = d3.scale
             .linear()
             .domain([1, NegNum])
-            .range(['#019858', '#DFFFDF']); //由深到淺
+            .range([deepColor1, lightColor1]); //由深到淺
         var countryPosColor = d3.scale
             .linear()
             .domain([1, PosNum])
-            .range(['#FF5151', '#FFD2D2']);
+            .range([deepColor2, lightColor2]);
 
-        var PackDataset = [];
-        //做單層就好，這邊直接設定children
-        PackDataset[0] = { "children": NegcashBuyChange } //現金買入:跌-----
-        PackDataset[1] = { "children": NegcashSellChange } //現金賣出:跌---'-----
-        PackDataset[2] = { "children": NegSightBuyChange } //即期買入:跌---'----'-----
-        PackDataset[3] = { "children": NegSightSellChange } //即期賣出:跌--'----'----'-----
-        PackDataset[4] = { "children": PoscashBuyChange } //現金買入:漲----'    '    '    '
-        PackDataset[5] = { "children": PoscashSellChange } //現金賣出:漲--------'    '    '
-        PackDataset[6] = { "children": PosSightBuyChange } //即期買入:漲-------------'    '
-        PackDataset[7] = { "children": PosSightSellChange } //即期賣出:漲------------------
-
-        var packWidth = 250,
-            packHeight = 250;
-        var packSvgMarginLeft = 20,
-            packSvgMarginRight = 20;
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        PoscashBuyChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
+        PoscashSellChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
+        PosSightBuyChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
+        PosSightSellChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
+        NegcashBuyChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
+        NegcashSellChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
+        NegSightBuyChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
+        NegSightSellChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
 
 
-        //create pack
-        var pack = d3.layout.pack()
-            .padding(10) //泡泡間的間距
-            .size([packWidth, packHeight]) //整張圖的寬高
-            .sort(function(a, b) {
-                return b.packValue - a.packValue;
-            })
+        var pie = d3.layout.pie()
             .value(function(d) {
                 return d.packValue;
             });
 
-        //create each packSVG and node
-        var packSVG = [];
-        var nodes = [];
-        for (var i = 0; i < 8; ++i) {
-            packSVG[i] = d3.select("#bubbleChart") //創造一個畫布
+        var pieData = [pie(NegcashBuyChange), pie(PoscashBuyChange),
+            pie(NegcashSellChange), pie(PoscashSellChange),
+            pie(NegSightBuyChange), pie(PosSightBuyChange),
+            pie(NegSightSellChange), pie(PosSightSellChange)
+        ];
+        // console.log(pieData);
+
+        var pieChartWidth = 320;
+        var pieChartHeight = 400;
+
+        var outerRadius = pieChartWidth / 2;
+        var innerRadius = pieChartWidth / 3;
+
+        var textOffset = 260;
+
+        var arc = d3.svg.arc()
+            .outerRadius(outerRadius - 50)
+            .innerRadius(innerRadius - 50);
+
+        var textArc = d3.svg.arc()
+            .outerRadius(outerRadius + textOffset)
+            .innerRadius(innerRadius + textOffset);
+
+        var pieChartSvgWidth = screen.availWidth * 0.5 - 20;
+        var pieChartSvgHeight = screen.availHeight * 0.94;
+
+        var PieChartSvg = [8];
+        //創造八張圖
+        for (var a = 0; a < 8; ++a) {
+            PieChartSvg[a] = d3.select("body")
                 .append("svg")
-                .attr("width", (screen.availWidth - 20) / 4)
-                .attr("height", (screen.availHeight - 200) / 2)
-                .attr("class", "packSVG" + i);
+                .attr("width", pieChartSvgWidth)
+                .attr("height", pieChartSvgHeight)
+                .attr("class", "PieChartSvg" + a);
 
-            nodes[i] = pack.nodes(PackDataset[i])
-                .filter(function(d) { //透過filter把parent過濾掉，不然外面會包一個大圓(這邊的parent就是所有children裡value的值的總和)
-                    return d.parent;
-                });
-        }
-        //create bubbles
-        var whichSVG = 0;
-        var tmpR = 0;
-        for (var cnt = 0; cnt < 8; ++cnt) {
-            d3.select(".packSVG" + cnt)
-                .selectAll("circle") // 建立 circle 的 Selection
-                .data(nodes[cnt]) // 綁定 selection 與資料
-                .enter() // 對於任何沒被對應而落單的資料 ...
-                .append("circle") // 新增一個 circle 標籤
-                .attr({
-                    cx: function(d) { return d.x + packSvgMarginLeft; }, // 用 x,y 當圓心
-                    cy: function(d) { return d.y; },
-                    r: function(d) { return 1 * d.r; }, // 用 r 當半徑
-                    id: function(d, i) {
-                        // console.log(d, i);
-                        // console.log("circlesOnSVG" + cnt + i);
-                        return "circlesOnSVG" + cnt + i;
-
-                    },
-                    // stroke: "#5B5B5B", // 邊框畫灰色
-                    class: "circlesOnSVG" + cnt
-                })
-                .on("mouseover", function(d, i) {
-                    whichSVG = d3.select(this).attr("class").split("circlesOnSVG")[1];
-                    //fade
-                    d3.select(this)
-                        .attr("fill-opacity", 0.82);
-
-                    //countryName zoom in
-                    d3.select(".svgtextName" + d.country + whichSVG)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "24px")
-                        .attr("opacity", "1");
-
-                    //countryValue fade in
-                    d3.select(".svgtext" + d.country + whichSVG)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "24px")
-                        .attr("opacity", "1");
-                })
-                .on("mouseout", function(d, i) {
-                    tmpR = d3.select(this).attr("r");
-
-                    //fill color
-                    d3.select(this)
-                        .attr("fill-opacity", 1);
-
-                    //countryName zoom out
-                    d3.select(".svgtextName" + d.country + whichSVG)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", function(d, i) {
-                            if (tmpR > 50) return "20px";
-                            else if (tmpR > 25) return "12px";
-                            else if (tmpR < 12) return Math.floor(tmpR - 4) + "px";
-                            else return "10px"; //radius : 12-25 == > 10px 
-                        });
-
-                    //countryValue fade out
-                    d3.select(".svgtext" + d.country + whichSVG)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "1px")
-                        .attr("opacity", "0");
+            PieChartSvg[a].append("rect")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("fill", function() {
+                    if (a == 0 || a == 1) return "#ffffff";
+                    if (a == 2 || a == 3) return "#f7f7f7";
+                    if (a == 4 || a == 5) return "#ffffff";
+                    if (a == 6 || a == 7) return "#f7f7f7";
                 });
 
-            d3.select(".packSVG" + cnt)
-                .selectAll("text")
-                .data(nodes[cnt])
+
+            //繪製弧形
+            var arcs = PieChartSvg[a].selectAll("g.arc")
+                .data(pieData[a])
                 .enter()
-                .append("text")
-                .attr("class", function(d, i) {
-                    return "svgtextName" + d.country + cnt;
+                .append("g") //分組
+                .attr("class", function() {
+                    return "arc";
                 })
-                .attr({
-                    x: function(d) { return d.x + packSvgMarginLeft; },
-                    y: function(d) { return d.y; },
-                    "text-anchor": "middle",
+                .attr("transform", "translate(" + (outerRadius + textOffset - 80) + "," + (outerRadius + textOffset - 80) + ")"); //將每組移到中心
+
+            //將組中每個元素繪製弧形路徑
+            arcs.append("path") //每個g元素都追加一個path元素用綁訂到這個g的數據d生成路徑訊息
+                .attr("fill", function(d, i) {
+                    if (a % 2 == 0) {
+                        return countryNegColor(i);
+                    } else {
+                        return countryPosColor(i);
+                    }
                 })
+                // .attr("stroke-width", "5px")
+                .attr("d", arc)
+                .on("mouseover", function() {
+                    d3.select(this).attr("opacity", 0.8);
+                })
+                .on("mouseout", function() {
+                    d3.select(this).attr("opacity", 1);
+                }); //將角度轉為弧度
+
+
+            var textX, textY, textR, tmpI;
+            //加上文字
+            arcs.append("text")
+                .attr("transform", function(d, i) {
+                    textX = parseFloat(textArc.centroid(d)[0]);
+                    textY = parseFloat(textArc.centroid(d)[1]);
+                    textR = Math.sqrt(Math.pow(Math.abs(textX), 2) + Math.pow(Math.abs(textY), 2));
+                    tmpI = i;
+                    // console.log((textX / 14) * (i + 1), (textY / 14) * (i + 1));
+
+                    //一高一低
+                    // console.log(((textX / 14) * (7)), ((textY / 14) * (7)));
+                    if (i % 2 == 0) return "translate(" + ((textX / 14) * (7)) + "," + ((textY / 14) * (7)) + ")";
+                    else return "translate(" + ((textX / 14) * (10)) + "," + ((textY / 14) * (10)) + ")";
+
+                    //兩段式
+                    // if (tmpI >= 0.5 * NegcashBuyChange.length) tmpI -= 0.5 * NegcashBuyChange.length;
+                    // return "translate(" + ((textX / NegcashBuyChange.length) * (0.5 * NegcashBuyChange.length + tmpI * 0.5)) + "," + ((textY / NegcashBuyChange.length) * (0.5 * NegcashBuyChange.length + tmpI * 0.5)) + ")";
+
+                    //大圓
+                    // return "translate(" + textArc.centroid(d) + ")"; //centroid(d)可得出弧形的中心點
+                })
+                .attr("text-anchor", "middle")
+                .attr("font-family", "Noto Sans TC")
                 .text(function(d, i) {
                     for (var w = 0; w < allCountryName.length; ++w) {
-                        if (d.country == allCountryName[w])
-                            return chineseCountryName[w]
+                        if (d.data.country == allCountryName[w]) {
+                            return chineseCountryName[w];
+                        }
                     }
-                    //return d.country; //////////////////////////
-                })
-                .attr("font-family", "Noto Sans TC")
-                .attr("font-size", function(d, i) {
-                    if (d.r > 50) return "20px";
-                    else if (d.r > 25) return "12px";
-                    else if (d.r < 12) return Math.floor(d.r - 4) + "px";
-                    else return "10px"; //radius : 12-25 == > 10px 
-                })
-                .attr("fill", function(d) {
-                    return "black";
-                })
-                .on("mouseover", function(d, i) {
-                    //countryName zoom in
-                    d3.select(this)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "24px")
-                        .attr("opacity", "1");
-
-                    //countryValue fade in
-                    d3.select(".svgtext" + d.country + whichSVG)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "24px")
-                        .attr("opacity", "1");
-                })
-                .on("mouseout", function(d, i) {
-                    //countryName zoom out
-                    d3.select(this)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", function(d, i) {
-                            if (d.r > 50) return "20px";
-                            else if (d.r > 25) return "12px";
-                            else if (d.r < 12) return Math.floor(d.r - 4) + "px";
-                            else return "10px"; //radius : 12-25 == > 10px 
-                        })
-                        .attr("opacity", "1");
-
-                    //countryValue fade out
-                    d3.select(".svgtext" + d.country + whichSVG)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "1px")
-                        .attr("opacity", "0");
+                    // console.log(d.data.country)
+                    // return d.data.country;
                 })
                 .append('tspan') //create a linebreak
-                .attr("class", function(d, i) {
-                    return "svgtext" + d.country + cnt;
-                })
-                .attr({
-                    x: function(d) { return d.x + packSvgMarginLeft; },
-                    y: function(d) { return d.y + 25; },
-                    "text-anchor": "middle",
-                })
+                .attr("x", 0)
+                .attr("y", 20)
+                .attr("text-anchor", "middle")
+                .attr("font-family", "Noto Sans TC")
                 .text(function(d) {
-                    return (d.packValue * 100).toFixed(3) + "%";
+                    return (d.value * 100).toFixed(3) + "%";
+                });
+            //加上線段
+            arcs.append("line") // attach a line
+                .style("stroke", function(d, i) {
+                    if (a % 2 == 0) {
+                        return countryNegColor(i);
+                    } else {
+                        return countryPosColor(i);
+                    }
                 })
-                .attr("font-family", "sans-serif")
-                .attr("font-size", "1px")
-                .attr("fill", function(d) {
-                    return "black";
+                .style("stroke-width", 0.5)
+                .attr("x1", function(d, i) {
+                    textX = parseFloat(textArc.centroid(d)[0]);
+                    return 0.25 * textX;
                 })
-                .attr("opacity", "0")
-                .on("mouseover", function(d, i) {
-                    //countryName zoom in
-                    d3.select(".svgtextName" + d.country + whichSVG)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "24px")
-                        .attr("opacity", "1");
+                .attr("x2", function(d, i) {
+                    textX = parseFloat(textArc.centroid(d)[0]);
+                    if (i % 2 == 0) {
+                        return 0.42 * textX;
+                    } else {
+                        return 0.65 * textX;
+                    }
 
-                    //countryValue fade in
-                    d3.select(this)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "24px")
-                        .attr("opacity", "1");
                 })
-                .on("mouseout", function(d, i) {
-                    //countryName zoom out
-                    d3.select(".svgtextName" + d.country + whichSVG)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", function(d, i) {
-                            if (d.r > 50) return "20px";
-                            else if (d.r > 25) return "12px";
-                            else if (d.r < 12) return Math.floor(d.r - 4) + "px";
-                            else return "10px"; //radius : 12-25 == > 10px 
-                        })
-                        .attr("opacity", "1");
-                    //countryValue fade out
-                    d3.select(this)
-                        .transition()
-                        .duration(500)
-                        .attr("font-size", "10px")
-                        .attr("opacity", "0");
-
+                .attr("y1", function(d, i) {
+                    textY = parseFloat(textArc.centroid(d)[1]);
+                    return 0.25 * textY;
+                })
+                .attr("y2", function(d, i) {
+                    textY = parseFloat(textArc.centroid(d)[1]);
+                    if (i % 2 == 0) {
+                        return 0.42 * textY;
+                    } else {
+                        return 0.65 * textY;
+                    }
                 });
 
-        } //for
-
-        // 下面的bubble顏色用漸層的
-        var allKindOfRate = [NegcashBuyChange, NegcashSellChange, NegSightBuyChange, NegSightSellChange,
-            PoscashBuyChange, PoscashSellChange, PosSightBuyChange, PosSightSellChange
-        ]
-        var packLength = [NegArr[0], NegArr[1], NegArr[2], NegArr[3], PosArr[0], PosArr[1], PosArr[2], PosArr[3], ]
-        for (var n = 0; n < 8; ++n) {
-            for (var i = 0; i < packLength[n]; ++i) {
-                for (var j = 0; j < packLength[n]; ++j) {
-                    if (d3.selectAll(".circlesOnSVG" + n)[0][j].__data__.country == allKindOfRate[n][i].country) {
-                        d3.select("#circlesOnSVG" + n + j).attr("fill", function() {
-                            if (n < 4) return countryNegColor(i + 1);
-                            else return countryPosColor(i + 1);
-                        });
-                        // console.log(d3.selectAll(".circlesOnSVG0")[0][j].__data__.country);
-                        // console.log(d3.select("#circlesOnSVG0" + j).attr("fill", countryNegColor(i + 1)));
-                        // console.log(i);
+            arcs.append("text")
+                .attr("text-anchor", "middle")
+                .attr('font-size', '18px')
+                .attr("font-family", "Noto Sans TC")
+                .attr('y', 0)
+                .text(function(d, i) {
+                    if (i == 0) { //append一次就好
+                        if (a == 0) return "現金買入跌幅";
+                        if (a == 2) return "現金賣出跌幅";
+                        if (a == 4) return "即期買入跌幅";
+                        if (a == 6) return "即期賣出跌幅";
+                        if (a == 1) return "現金買入漲幅";
+                        if (a == 3) return "現金賣出漲幅";
+                        if (a == 5) return "即期買入漲幅";
+                        if (a == 7) return "即期賣出漲幅";
                     }
-                }
-            }
-        }
+                });
+            // arcs.append("text")
+            //     .attr("text-anchor", "middle")
+            //     .attr('font-size', '18px')
+            //     .attr("font-family", "Noto Sans TC")
+            //     .attr('y', 0.5 * pieChartSvgHeight - 10)
+            //     .text(function(d, i) {
+            //         if (i == 0) { //append一次就好
+            //             if (a == 0) return "現金買入跌幅";
+            //             if (a == 2) return "現金賣出跌幅";
+            //             if (a == 4) return "即期買入跌幅";
+            //             if (a == 6) return "即期賣出跌幅";
+            //             if (a == 1) return "現金買入漲幅";
+            //             if (a == 3) return "現金賣出漲幅";
+            //             if (a == 5) return "即期買入漲幅";
+            //             if (a == 7) return "即期賣出漲幅";
+            //         }
+            //     });
+
+        } //PIE for 
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // var PackDataset = [];
+        // //做單層就好，這邊直接設定children
+        // PackDataset[0] = { "children": NegcashBuyChange } //現金買入:跌-----
+        // PackDataset[2] = { "children": NegcashSellChange } //現金賣出:跌---'-----
+        // PackDataset[4] = { "children": NegSightBuyChange } //即期買入:跌---'----'-----
+        // PackDataset[6] = { "children": NegSightSellChange } //即期賣出:跌--'----'----'-----
+        // PackDataset[1] = { "children": PoscashBuyChange } //現金買入:漲----'    '    '    '
+        // PackDataset[3] = { "children": PoscashSellChange } //現金賣出:漲--------'    '    '
+        // PackDataset[5] = { "children": PosSightBuyChange } //即期買入:漲-------------'    '
+        // PackDataset[7] = { "children": PosSightSellChange } //即期賣出:漲------------------
+
+        // var packWidth = (screen.availWidth - 20) / 8,
+        //     packHeight = 600;
+        // var packSvgMarginLeft = 20,
+        //     packSvgMarginRight = 20;
+
+
+        // //create pack
+        // var pack = d3.layout.pack()
+        //     .padding(10) //泡泡間的間距
+        //     .size([packWidth, packHeight]) //整張圖的寬高
+        //     .sort(function(a, b) {
+        //         return b.packValue - a.packValue;
+        //     })
+        //     .value(function(d) {
+        //         return d.packValue;
+        //     });
+
+        // //create each packSVG and node
+        // var packSVG = [];
+        // var nodes = [];
+        // for (var i = 0; i < 8; ++i) {
+        //     packSVG[i] = d3.select("#bubbleChart") //創造一個畫布
+        //         .append("svg")
+        //         // .attr("width", (screen.availWidth - 20) / 4)
+        //         // .attr("height", (screen.availHeight - 200) / 2)
+        //         .attr("width", packWidth)
+        //         .attr("height", packHeight)
+        //         .attr("class", "packSVG" + i);
+
+        //     nodes[i] = pack.nodes(PackDataset[i])
+        //         .filter(function(d) { //透過filter把parent過濾掉，不然外面會包一個大圓(這邊的parent就是所有children裡value的值的總和)
+        //             return d.parent;
+        //         });
+        // }
+        // //create bubbles
+        // var whichSVG = 0;
+        // var tmpR = 0;
+        // for (var cnt = 0; cnt < 8; ++cnt) {
+        //     d3.select(".packSVG" + cnt)
+        //         .selectAll("circle") // 建立 circle 的 Selection
+        //         .data(nodes[cnt]) // 綁定 selection 與資料
+        //         .enter() // 對於任何沒被對應而落單的資料 ...
+        //         .append("circle") // 新增一個 circle 標籤
+        //         .attr({
+        //             // cx: function(d) { return d.x + packSvgMarginLeft; }, // 用 x,y 當圓心
+        //             // cy: function(d) { return d.y; },
+        //             r: function(d) { return 1 * d.r; }, // 用 r 當半徑
+        //             id: function(d, i) {
+        //                 // console.log(d, i);
+        //                 // console.log("circlesOnSVG" + cnt + i);
+        //                 return "circlesOnSVG" + cnt + i;
+
+        //             },
+        //             // stroke: "#5B5B5B", // 邊框畫灰色
+        //             class: "circlesOnSVG" + cnt
+        //         })
+        //         .on("mouseover", function(d, i) {
+        //             whichSVG = d3.select(this).attr("class").split("circlesOnSVG")[1];
+        //             //fade
+        //             d3.select(this)
+        //                 .attr("fill-opacity", 0.82);
+
+        //             //countryName zoom in
+        //             d3.select(".svgtextName" + whichSVG + i)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "24px")
+        //                 .attr("opacity", "1");
+
+        //             //countryValue fade in
+        //             d3.select(".svgtext" + whichSVG + i)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "24px")
+        //                 .attr("opacity", "1");
+        //         })
+        //         .on("mouseout", function(d, i) {
+        //             tmpR = d3.select(this).attr("r");
+
+        //             //fill color
+        //             d3.select(this)
+        //                 .attr("fill-opacity", 1);
+
+        //             //countryName zoom out
+        //             d3.select(".svgtextName" + whichSVG + i)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", function(d, i) {
+        //                     if (tmpR > 50) return "20px";
+        //                     else if (tmpR > 25) return "12px";
+        //                     else if (tmpR < 12) return Math.floor(tmpR - 4) + "px";
+        //                     else return "10px"; //radius : 12-25 == > 10px 
+        //                 });
+
+        //             //countryValue fade out
+        //             d3.select(".svgtext" + whichSVG + i)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "1px")
+        //                 .attr("opacity", "0");
+        //         });
+
+        //     d3.select(".packSVG" + cnt)
+        //         .selectAll("text")
+        //         .data(nodes[cnt])
+        //         .enter()
+        //         .append("text")
+        //         .attr("class", function(d, i) {
+        //             // console.log("svgtextName" + d.country + cnt);
+        //             return "svgtextName" + cnt + i;
+        //         })
+        //         .attr({
+        //             x: function(d) { return packWidth * 0.5; },
+        //             // y: function(d) {
+        //             //     // console.log(this.className)
+        //             //     return d.y;
+        //             // },
+        //             // x: function(d) { return d.x + packSvgMarginLeft; },
+        //             // y: function(d) { return d.y; },
+        //             "text-anchor": "middle",
+        //         })
+        //         .text(function(d, i) {
+        //             for (var w = 0; w < allCountryName.length; ++w) {
+        //                 if (d.country == allCountryName[w]) {
+        //                     return chineseCountryName[w];
+        //                 }
+
+        //             }
+        //             //return d.country; //////////////////////////
+        //         })
+        //         .attr("font-family", "Noto Sans TC")
+        //         .attr("font-size", function(d, i) {
+        //             if (d.r > 50) return "20px";
+        //             else if (d.r > 25) return "12px";
+        //             else if (d.r < 12) return Math.floor(d.r - 4) + "px";
+        //             else return "10px"; //radius : 12-25 == > 10px 
+        //         })
+        //         .attr("fill", function(d) {
+        //             return "black";
+        //         })
+        //         .on("mouseover", function(d, i) {
+        //             //countryName zoom in
+        //             d3.select(this)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "24px")
+        //                 .attr("opacity", "1");
+
+        //             //countryValue fade in
+        //             d3.select(".svgtext" + whichSVG + i)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "24px")
+        //                 .attr("opacity", "1");
+        //         })
+        //         .on("mouseout", function(d, i) {
+        //             //countryName zoom out
+        //             d3.select(this)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", function(d, i) {
+        //                     if (d.r > 50) return "20px";
+        //                     else if (d.r > 25) return "12px";
+        //                     else if (d.r < 12) return Math.floor(d.r - 4) + "px";
+        //                     else return "10px"; //radius : 12-25 == > 10px 
+        //                 })
+        //                 .attr("opacity", "1");
+
+        //             //countryValue fade out
+        //             d3.select(".svgtext" + whichSVG + i)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "1px")
+        //                 .attr("opacity", "0");
+        //         })
+        //         .append('tspan') //create a linebreak
+        //         .attr("class", function(d, i) {
+        //             return "svgtext" + cnt + i;
+        //         })
+        //         .attr({
+        //             x: function(d) { return packWidth * 0.5; },
+        //             // y: function(d) { return d.y + 25; },
+        //             "text-anchor": "middle",
+        //         })
+        //         .text(function(d) {
+        //             return (d.packValue * 100).toFixed(3) + "%";
+        //         })
+        //         .attr("font-family", "sans-serif")
+        //         .attr("font-size", "1px")
+        //         .attr("fill", function(d) {
+        //             return "black";
+        //         })
+        //         .attr("opacity", "0")
+        //         .on("mouseover", function(d, i) {
+        //             //countryName zoom in
+        //             d3.select(".svgtextName" + whichSVG + i)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "24px")
+        //                 .attr("opacity", "1");
+
+        //             //countryValue fade in
+        //             d3.select(this)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "24px")
+        //                 .attr("opacity", "1");
+        //         })
+        //         .on("mouseout", function(d, i) {
+        //             //countryName zoom out
+        //             d3.select(".svgtextName" + whichSVG + i)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", function(d, i) {
+        //                     if (d.r > 50) return "20px";
+        //                     else if (d.r > 25) return "12px";
+        //                     else if (d.r < 12) return Math.floor(d.r - 4) + "px";
+        //                     else return "10px"; //radius : 12-25 == > 10px 
+        //                 })
+        //                 .attr("opacity", "1");
+        //             //countryValue fade out
+        //             d3.select(this)
+        //                 .transition()
+        //                 .duration(500)
+        //                 .attr("font-size", "10px")
+        //                 .attr("opacity", "0");
+
+        //         });
+
+        //     d3.select(".packSVG" + cnt)
+        //         .append("text")
+        //         .attr("x", packWidth * 0.5)
+        //         .attr("y", 40)
+        //         .attr("text-anchor", "middle")
+        //         .attr("font-family", "Noto Sans TC")
+        //         .attr("fill", function() {
+        //             // if (cnt < 4) return deepColor1;
+        //             // else return deepColor2;
+        //             return "black";
+        //         })
+        //         .text(function() {
+        //             if (cnt == 0) return "現金買入跌幅";
+        //             if (cnt == 2) return "現金賣出跌幅";
+        //             if (cnt == 4) return "即期買入跌幅";
+        //             if (cnt == 6) return "即期賣出跌幅";
+        //             if (cnt == 1) return "現金買入漲幅";
+        //             if (cnt == 3) return "現金賣出漲幅";
+        //             if (cnt == 5) return "即期買入漲幅";
+        //             if (cnt == 7) return "即期賣出漲幅";
+        //         });
+
+        //     // console.log(d3.selectAll(".circlesOnSVG" + cnt));
+
+
+        // } //for
+        // var prevR = 0;
+        // var currentR = 0;
+        // var returnHeight = packHeight - 50;
+
+        // var prevR2 = 0;
+        // var currentR2 = 0;
+        // var returnHeight2 = packHeight - 50;
+
+        // var prevR3 = 0;
+        // var currentR3 = 0;
+        // var returnHeight3 = packHeight - 50;
+
+        // // 下面的bubble顏色用漸層的
+        // var allKindOfRate = [NegcashBuyChange, PoscashBuyChange, NegcashSellChange, PoscashSellChange, NegSightBuyChange, PosSightBuyChange, NegSightSellChange,
+        //     PosSightSellChange
+        // ]
+        // var packLength = [NegArr[0], PosArr[0], NegArr[1], PosArr[1], NegArr[2], PosArr[2], NegArr[3], PosArr[3], ]
+        // for (var n = 0; n < 8; ++n) {
+        //     for (var i = 0; i < packLength[n]; ++i) {
+        //         for (var j = 0; j < packLength[n]; ++j) {
+        //             if (d3.selectAll(".circlesOnSVG" + n)[0][j].__data__.country == allKindOfRate[n][i].country) {
+        //                 // console.log(d3.select(".svgtextName" + n + j));
+        //                 // console.log(d3.select("#circlesOnSVG" + n + j));
+
+        //                 d3.select("#circlesOnSVG" + n + j)
+        //                     .attr("fill", function() {
+        //                         if (n % 2 == 0) return countryNegColor(i + 1);
+        //                         else return countryPosColor(i + 1);
+        //                     })
+        //                     .attr({
+        //                         "cx": packWidth * 0.5,
+        //                         "cy": function() {
+        //                             // console.log(this);
+        //                             //console.log(i);
+        //                             currentR = parseFloat(d3.select(this).attr("r"));
+        //                             if (i == 0) {
+        //                                 returnHeight = packHeight - 50;
+        //                             } else {
+        //                                 returnHeight -= (prevR + currentR);
+        //                             }
+        //                             prevR = parseFloat(d3.select(this).attr("r"));
+        //                             return returnHeight;
+        //                         }
+        //                     });
+
+        //                 d3.select(".svgtextName" + n + j)
+        //                     .attr("y", function() {
+        //                         // console.log(this);
+        //                         //console.log(i);
+        //                         currentR2 = parseFloat(d3.select("#circlesOnSVG" + n + j).attr("r"));
+        //                         if (i == 0) {
+        //                             returnHeight2 = packHeight - 50;
+        //                         } else {
+        //                             returnHeight2 -= (prevR2 + currentR2);
+        //                         }
+        //                         prevR2 = parseFloat(d3.select("#circlesOnSVG" + n + j).attr("r"));
+        //                         return returnHeight2;
+        //                     });
+
+        //                 d3.select(".svgtext" + n + j)
+        //                     .attr("y", function() {
+        //                         // console.log(this);
+        //                         //console.log(i);
+        //                         currentR3 = parseFloat(d3.select("#circlesOnSVG" + n + j).attr("r"));
+        //                         if (i == 0) {
+        //                             returnHeight3 = packHeight - 50;
+        //                         } else {
+        //                             returnHeight3 -= (prevR3 + currentR3);
+        //                         }
+        //                         prevR3 = parseFloat(d3.select("#circlesOnSVG" + n + j).attr("r"));
+        //                         return returnHeight3 + 20;
+        //                     });
+        //                 // console.log(d3.selectAll(".circlesOnSVG0")[0][j].__data__.country);
+        //                 // console.log(d3.select("#circlesOnSVG0" + j).attr("fill", countryNegColor(i + 1)));
+        //                 // console.log(i);
+        //             }
+        //         }
+        //     }
+        //     returnHeight = packHeight - 50;
+        // }
 
     }) //d3.csv
