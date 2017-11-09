@@ -37,16 +37,16 @@ d3.csv("history.csv", function(tmpdata) {
             }
         }
         var whichCountry = 0;
-        var linechartWidth = screen.availWidth - $('.container1').width() - 30,
-            linechartHeight = $('.container1').height();
-        $('#lineChart').height(screen.availHeight);
-        // console.log($('.container1').width());
-        // console.log(linechartWidth);
-        // console.log(screen.availWidth);
-        // console.log(screen.width);
-        // $(".container1").css('height', linechartHeight);
 
-        //console.log(dividedCountryData[0][0].date);
+        // var linechartWidth = screen.availWidth - $('.container1').width() - 30,
+        //     linechartHeight = $('.container1').height();
+        //$('#lineChart').height(screen.availHeight);
+
+        var linechartMargin = { top: 30, right: 50, bottom: 70, left: 50 };
+
+        var linechartWidth = 0.9 * $('.col-lg-9').width() - linechartMargin.left - linechartMargin.right;
+        var linechartHeight = 0.6 * $('.col-lg-9').width() - linechartMargin.top - linechartMargin.bottom;
+
         //define max and min value.
         var minX = d3.min(dividedCountryData[whichCountry], function(d) { return parseInt(d.x) }),
             maxX = d3.max(dividedCountryData[whichCountry], function(d) { return parseInt(d.x) }),
@@ -72,33 +72,38 @@ d3.csv("history.csv", function(tmpdata) {
 
         linechartsvg.data(dividedCountryData[whichCountry])
             .attr({
-                'width': linechartWidth,
-                'height': linechartHeight,
+                'width': linechartWidth + linechartMargin.left + linechartMargin.right,
+                'height': linechartHeight + linechartMargin.top + linechartMargin.bottom,
             }).style({
                 // 'border': '1px solid #000'
+                // 'background':rgba(170,170,170,0.15)
             })
-            .on("mousemove", linechartMove);
+            .attr('transform', 'translate(' + linechartMargin.left + ',' + linechartMargin.top + ')')
+            .on("mousemove", linechartMove)
+            .on("touchmove", linechartMove);
+
+
 
         //設定偏移範圍及縮放範圍
-        var offsetX = 100,
-            offsetY = 70;
+        var offsetX = linechartWidth / 10,
+            offsetY = linechartHeight / 5;
 
         var scaleX = d3.scale.linear()
-            .range([0, linechartWidth - 2 * offsetX])
+            .range([0, linechartWidth])
             .domain([0, maxX]);
 
         var scaleX2 = d3.time.scale()
-            .range([0, linechartWidth - 2 * offsetX])
+            .range([0, linechartWidth])
             .domain([mindate, maxdate]);
 
         var scaleY = d3.scale.linear()
-            .range([linechartHeight, 0 + 2 * offsetY]) //d3 Y座標是越下越大,所以反過來比較直覺
+            .range([linechartHeight, 0]) //d3 Y座標是越下越大,所以反過來比較直覺
             .domain([minY, maxY]);
 
         //標明圖形主題
         var lineChartTopic = linechartsvg.append("text")
             .attr("x", 0.5 * linechartWidth)
-            .attr("y", linechartHeight - 20)
+            .attr("y", linechartHeight + linechartMargin.bottom)
             .text(function(d) { return "臺灣銀行最近三個月之匯率走勢圖"; })
             .attr("text-anchor", "middle")
             .attr("font-family", "Noto Sans TC")
@@ -155,10 +160,16 @@ d3.csv("history.csv", function(tmpdata) {
         var lineColor4 = '#F29D4B'; //2
 
         //標明線段
-        var beginX = 160,
-            beginY = 30,
-            lineLength = 50,
-            lineInterval = 260;
+        var beginX = linechartMargin.left,
+            beginY = 0.3 * linechartMargin.top,
+            lineLength = linechartWidth * 0.05,
+            lineInterval = linechartWidth / 4;
+        var linetextSize = 16;
+        if (linechartWidth < 300) {
+            linetextSize = 9;
+        } else if (linechartWidth < 500) {
+            linetextSize = 12;
+        }
         for (var i = 0; i < 4; ++i) {
             linechartsvg.append("line") // attach a line
                 .style("stroke", function() {
@@ -178,7 +189,10 @@ d3.csv("history.csv", function(tmpdata) {
                     return beginX + 0.5 * lineLength + i * lineInterval;
                 })
                 .attr("cy", beginY)
-                .attr("r", 5)
+                .attr("r", function() {
+                    if (linechartWidth < 400) return 3;
+                    else return 5;
+                })
                 .attr("fill", () => {
                     if (i == 0) return lineColor1;
                     if (i == 1) return lineColor2;
@@ -187,9 +201,9 @@ d3.csv("history.csv", function(tmpdata) {
                 })
             linechartsvg.append("text")
                 .attr("x", function() {
-                    return (beginX + lineLength) + 10 + i * lineInterval;
+                    return (beginX + lineLength) + 5 + i * lineInterval;
                 })
-                .attr("y", 36)
+                .attr("y", 0.3 * linechartMargin.top + 0.5 * linetextSize)
                 .text(function() {
                     if (i == 0) return "現金買入";
                     if (i == 1) return "現金賣出";
@@ -198,7 +212,7 @@ d3.csv("history.csv", function(tmpdata) {
                 })
                 .attr("text-anchor", "start")
                 .attr("font-family", "Noto Sans TC")
-                .attr("font-size", "16px")
+                .attr("font-size", linetextSize + "px")
                 .attr("fill", () => {
                     if (i == 0) return lineColor1;
                     if (i == 1) return lineColor2;
@@ -219,7 +233,7 @@ d3.csv("history.csv", function(tmpdata) {
                         if (i == 2) return lineColor3;
                         if (i == 3) return lineColor4;
                     },
-                    'transform': 'translate(' + (offsetX) + ', ' + (-offsetY) + ')', //用translate挑整axisX,axisY的位置
+                    'transform': 'translate(' + (linechartMargin.left) + ', ' + (linechartMargin.top) + ')', //用translate挑整axisX,axisY的位置
                     'fill': 'none'
                 });
         }
@@ -230,16 +244,18 @@ d3.csv("history.csv", function(tmpdata) {
             .call(axisXGrid)
             .attr({
                 'fill': 'none',
-                'stroke': 'rgba(0,0,0,.1)',
-                'transform': 'translate(' + (offsetX) + ', ' + (linechartHeight - offsetY) + ')'
+                'stroke': 'rgba(170,170,170,0.15)',
+                // 'stroke': 'rgba(0,0,0,.1)',
+                'transform': 'translate(' + (linechartMargin.left) + ', ' + (linechartHeight + linechartMargin.top) + ')'
             });
         //繪出Y軸標格
         linechartsvg.append('g')
             .call(axisYGrid)
             .attr({
                 'fill': 'none',
-                'stroke': 'rgba(0,0,0,.1)',
-                'transform': 'translate(' + (offsetX) + ',' + (-offsetY) + ')'
+                'stroke': 'rgba(170,170,170,0.15)',
+                // 'stroke': 'rgba(0,0,0,.1)',
+                'transform': 'translate(' + (linechartMargin.left) + ',' + (linechartMargin.top) + ')'
             });
         //繪出X軸
         linechartsvg.append('g')
@@ -247,8 +263,8 @@ d3.csv("history.csv", function(tmpdata) {
             .attr({
                 'class': 'axisX',
                 'fill': 'none',
-                'stroke': '#000',
-                'transform': 'translate(' + (offsetX) + ', ' + (linechartHeight - offsetY) + ')' //用translate挑整axisX,axisY的位置
+                'stroke': 'rgba(170,170,170,0.4)',
+                'transform': 'translate(' + (linechartMargin.left) + ', ' + (linechartHeight + linechartMargin.top) + ')' //用translate挑整axisX,axisY的位置
             })
             .selectAll('text')
             .attr({
@@ -263,8 +279,8 @@ d3.csv("history.csv", function(tmpdata) {
             .attr({
                 'class': 'axisY',
                 'fill': 'none',
-                'stroke': '#000',
-                'transform': 'translate(' + (offsetX) + ',' + (-offsetY) + ')' //用translate挑整axisX,axisY的位置
+                'stroke': 'rgba(170,170,170,0.15)',
+                'transform': 'translate(' + (linechartMargin.left) + ',' + (linechartMargin.top) + ')' //用translate挑整axisX,axisY的位置
             })
             .selectAll('text')
             .attr({
@@ -303,13 +319,13 @@ d3.csv("history.csv", function(tmpdata) {
                     return "dots" + i + " onLine" + j;
                 })
                 .attr('cx', function(d) {
-                    return scaleX(d.x) + offsetX;
+                    return scaleX(d.x) + linechartMargin.left;
                 })
                 .attr('cy', function(d) {
-                    if (j == 0) return scaleY(d.historyValue1) - offsetY;
-                    else if (j == 1) return scaleY(d.historyValue2) - offsetY;
-                    else if (j == 2) return scaleY(d.historyValue3) - offsetY;
-                    else if (j == 3) return scaleY(d.historyValue4) - offsetY;
+                    if (j == 0) return scaleY(d.historyValue1) + linechartMargin.top;
+                    else if (j == 1) return scaleY(d.historyValue2) + linechartMargin.top;
+                    else if (j == 2) return scaleY(d.historyValue3) + linechartMargin.top;
+                    else if (j == 3) return scaleY(d.historyValue4) + linechartMargin.top;
                 })
                 .attr('fill', function(d) {
                     if (j == 0) return lineColor1;
@@ -369,7 +385,7 @@ d3.csv("history.csv", function(tmpdata) {
 
                 //show data
                 for (var i = 0; i < dividedCountryData[whichCountry].length; ++i) {
-                    if (Math.abs(mousePosOnLinechart[0] - (scaleX(dividedCountryData[whichCountry][i].x) + offsetX)) < shineDistance) {
+                    if (Math.abs(mousePosOnLinechart[0] - (scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left)) < shineDistance) {
                         dotIsShining++;
                         //讓點反覆閃爍
                         d3.selectAll(".dots" + i)
@@ -399,15 +415,15 @@ d3.csv("history.csv", function(tmpdata) {
                             .attr('opacity', 0.4)
                             .attr("x", function() {
                                 // console.log(i);
-                                if (i < 15) return (scaleX(dividedCountryData[whichCountry][i].x) + offsetX) - infoWidth;
-                                else return (scaleX(dividedCountryData[whichCountry][i].x) + offsetX);
+                                if (i < 0.5 * dividedCountryData[whichCountry].length) return (scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left) - infoWidth;
+                                else return (scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left);
                             })
                             .attr("y", function() {
                                 //console.log((scaleY(dividedCountryData[whichCountry][i].historyValue2) - offsetY));
                                 if (dividedCountryData[whichCountry][0].historyValue2 == 0) {
-                                    return (scaleY(dividedCountryData[whichCountry][i].historyValue4) - offsetY);
+                                    return (scaleY(dividedCountryData[whichCountry][i].historyValue4) + linechartMargin.top);
                                 }
-                                return (scaleY(dividedCountryData[whichCountry][i].historyValue2) - offsetY);
+                                return (scaleY(dividedCountryData[whichCountry][i].historyValue2) + linechartMargin.top);
                             });
                         //顯示資料塊裡的文字
                         for (var j = 0; j < 5; ++j) {
@@ -416,14 +432,14 @@ d3.csv("history.csv", function(tmpdata) {
                                 .delay(10)
                                 .attr("opacity", 1)
                                 .attr("x", function() {
-                                    if (i < 15) return (scaleX(dividedCountryData[whichCountry][i].x) + offsetX) - infoWidth;
-                                    else return (scaleX(dividedCountryData[whichCountry][i].x) + offsetX);
+                                    if (i < 0.5 * dividedCountryData[whichCountry].length) return (scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left) - infoWidth;
+                                    else return (scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left);
                                 })
                                 .attr("y", function() {
                                     if (dividedCountryData[whichCountry][0].historyValue2 == 0) {
-                                        return (scaleY(dividedCountryData[whichCountry][i].historyValue4) - offsetY);
+                                        return (scaleY(dividedCountryData[whichCountry][i].historyValue4) + linechartMargin.top);
                                     }
-                                    return (scaleY(dividedCountryData[whichCountry][i].historyValue2) - offsetY);
+                                    return (scaleY(dividedCountryData[whichCountry][i].historyValue2) + linechartMargin.top);
                                 })
                                 .text(function(d) {
                                     if (j == 0) return dividedCountryData[whichCountry][i].date + "(" + chineseCountryName[whichCountry] + dividedCountryData[whichCountry][i].country + ")";
@@ -467,18 +483,18 @@ d3.csv("history.csv", function(tmpdata) {
                 //設定跟著滑鼠跑的那條線從長度從y = 0 到畫布的最底
                 d3.select('#flexibleLine')
                     .style('opacity', function() {
-                        if (mousePosOnLinechart[0] > (scaleX(dividedCountryData[whichCountry][0].x) + offsetX))
+                        if (mousePosOnLinechart[0] > (scaleX(dividedCountryData[whichCountry][0].x) + linechartMargin.left) + 10)
                             return 0;
-                        if (mousePosOnLinechart[0] < scaleX(dividedCountryData[whichCountry][dividedCountryData[whichCountry].length - 1].x) + offsetX)
+                        if (mousePosOnLinechart[0] < scaleX(dividedCountryData[whichCountry][dividedCountryData[whichCountry].length - 1].x) + linechartMargin.left)
                             return 0;
                         return 1;
                     })
                     .transition()
                     .duration(10)
                     .attr('x1', mousePosOnLinechart[0])
-                    .attr('y1', 0 + offsetY)
+                    .attr('y1', 0 + linechartMargin.top)
                     .attr('x2', mousePosOnLinechart[0])
-                    .attr('y2', mousePosOnLinechart[1] + (linechartHeight - mousePosOnLinechart[1]) - offsetY);
+                    .attr('y2', mousePosOnLinechart[1] + (linechartHeight - mousePosOnLinechart[1] + linechartMargin.top));
             }
 
         }
@@ -508,7 +524,7 @@ d3.csv("history.csv", function(tmpdata) {
             maxdate = new Date(dividedCountryData[0][0].date);
 
             scaleY = d3.scale.linear()
-                .range([linechartHeight, 0 + 2 * offsetY]) //d3 Y座標是越下越大,所以反過來比較直覺
+                .range([linechartHeight, 0]) //d3 Y座標是越下越大,所以反過來比較直覺
                 .domain([minY, maxY]);
 
             axisY = d3.svg.axis()
@@ -545,14 +561,14 @@ d3.csv("history.csv", function(tmpdata) {
                         .select(".dots" + i + ".onLine" + j)
                         .duration(dataChangingTime)
                         .attr('cx', function(d) {
-                            return scaleX(dividedCountryData[whichCountry][i].x) + offsetX;
+                            return scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left;
                         })
                         .attr('cy', function(d) {
                             //console.log(scaleY(dividedCountryData[whichCountry][i].historyValue2) - offsetY);
-                            if (j == 0) return scaleY(dividedCountryData[whichCountry][i].historyValue1) - offsetY;
-                            else if (j == 1) return scaleY(dividedCountryData[whichCountry][i].historyValue2) - offsetY;
-                            else if (j == 2) return scaleY(dividedCountryData[whichCountry][i].historyValue3) - offsetY;
-                            else if (j == 3) return scaleY(dividedCountryData[whichCountry][i].historyValue4) - offsetY;
+                            if (j == 0) return scaleY(dividedCountryData[whichCountry][i].historyValue1) + linechartMargin.top;
+                            else if (j == 1) return scaleY(dividedCountryData[whichCountry][i].historyValue2) + linechartMargin.top;
+                            else if (j == 2) return scaleY(dividedCountryData[whichCountry][i].historyValue3) + linechartMargin.top;
+                            else if (j == 3) return scaleY(dividedCountryData[whichCountry][i].historyValue4) + linechartMargin.top;
                         });
                 }
 
@@ -596,10 +612,9 @@ d3.csv("history.csv", function(tmpdata) {
                 updateData();
             })
 
-        // var lineChartUL = document.getElementById("lineChartUL");
-        // lineChartUL.style['background-color'] = "pink";
-        // console.log(lineChartUL.style);
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /* --- Bar chart --- */
+
+        /* arrange data for bar chart */
         var PoscashBuyChange = [],
             PoscashSellChange = [],
             PosSightBuyChange = [],
@@ -609,38 +624,33 @@ d3.csv("history.csv", function(tmpdata) {
             NegSightBuyChange = [],
             NegSightSellChange = [];
 
-
-        // var countryColor = ["#680097", "#90B2E4", "#FFD464", "#F4806D", "#CCA8E9", "#D0F9B1", "#2DBA63", "#C244FB", "pink", "#FBE6A2",
-        //     "#E84A5F", "#368C72", "#FFC468", "#F7F7D1", "#466551", "#96D38C", "pink", "#96D38C", "pink"
-        // ];
-
         for (var i = 0; i < allCountryName.length; ++i) {
             if (dividedCountryData[i][1].historyValue1 != 0 && (dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) != 0) {
                 if ((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1 > 0) {
-                    PoscashBuyChange.push({ country: allCountryName[i], packValue: (dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1 });
+                    PoscashBuyChange.push({ country: allCountryName[i], changeValue: (dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1 });
                 } else {
-                    NegcashBuyChange.push({ country: allCountryName[i], packValue: Math.abs((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1) });
+                    NegcashBuyChange.push({ country: allCountryName[i], changeValue: Math.abs((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1) });
                 }
             }
             if (dividedCountryData[i][1].historyValue2 != 0 && (dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) != 0) {
                 if ((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2 > 0) {
-                    PoscashSellChange.push({ country: allCountryName[i], packValue: (dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2 });
+                    PoscashSellChange.push({ country: allCountryName[i], changeValue: (dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2 });
                 } else {
-                    NegcashSellChange.push({ country: allCountryName[i], packValue: Math.abs((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2) });
+                    NegcashSellChange.push({ country: allCountryName[i], changeValue: Math.abs((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2) });
                 }
             }
             if (dividedCountryData[i][1].historyValue3 != 0 && (dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) != 0) {
                 if ((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3 > 0) {
-                    PosSightBuyChange.push({ country: allCountryName[i], packValue: (dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3 });
+                    PosSightBuyChange.push({ country: allCountryName[i], changeValue: (dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3 });
                 } else {
-                    NegSightBuyChange.push({ country: allCountryName[i], packValue: Math.abs((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3) });
+                    NegSightBuyChange.push({ country: allCountryName[i], changeValue: Math.abs((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3) });
                 }
             }
             if (dividedCountryData[i][1].historyValue4 != 0 && (dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) != 0) {
                 if ((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4 > 0) {
-                    PosSightSellChange.push({ country: allCountryName[i], packValue: (dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4 });
+                    PosSightSellChange.push({ country: allCountryName[i], changeValue: (dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4 });
                 } else {
-                    NegSightSellChange.push({ country: allCountryName[i], packValue: Math.abs((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4) });
+                    NegSightSellChange.push({ country: allCountryName[i], changeValue: Math.abs((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4) });
                 }
             }
         }
@@ -649,11 +659,19 @@ d3.csv("history.csv", function(tmpdata) {
         var NegArr = [NegcashBuyChange.length, NegcashSellChange.length, NegSightBuyChange.length, NegSightSellChange.length];
         var NegNum = d3.max(NegArr);
 
-        var
-            deepColor1 = "#359768",
+        var allKindOfRate = [NegcashBuyChange, PoscashBuyChange, NegcashSellChange, PoscashSellChange, NegSightBuyChange, PosSightBuyChange, NegSightSellChange,
+            PosSightSellChange
+        ];
+
+        for (var i = 0; i < 8; ++i) {
+            allKindOfRate[i].sort(function(x, y) { return d3.descending(x.changeValue, y.changeValue); });
+        }
+
+        /* Create gradient color */
+        var deepColor1 = "#359768",
             lightColor1 = "#CEFFCE",
-            deepColor2 = "#6465A5",
-            lightColor2 = "#d9d9f9";
+            deepColor2 = "#ff7575",
+            lightColor2 = "#FFD2D2";
 
         var countryNegColor = d3.scale
             .linear()
@@ -664,210 +682,379 @@ d3.csv("history.csv", function(tmpdata) {
             .domain([1, PosNum])
             .range([deepColor2, lightColor2]);
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        PoscashBuyChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
-        PoscashSellChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
-        PosSightBuyChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
-        PosSightSellChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
-        NegcashBuyChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
-        NegcashSellChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
-        NegSightBuyChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
-        NegSightSellChange.sort(function(x, y) { return d3.descending(x.packValue, y.packValue); });
+        /* Start to draw */
+        var barchartMargin = { top: 20, right: 20, bottom: 70, left: 100 };
+        var barchartWidth = 800 - barchartMargin.left - barchartMargin.right;
+        var barchartHeight = 600 - barchartMargin.top - barchartMargin.bottom;
 
+        var whichBtn = 0;
 
-        var pie = d3.layout.pie()
-            .value(function(d) {
-                return d.packValue;
+        var barchartScaleX = d3.scale.ordinal().rangeRoundBands([0, barchartWidth], 0.1).domain(allKindOfRate[whichBtn].map(function(d) { return d.country; }));
+        var barchartScaleY = d3.scale.linear().range([barchartHeight, 0]).domain([0, d3.max(allKindOfRate[whichBtn], function(d) { return d.changeValue; })]);
+
+        var barchartScaleXAxis = d3.svg.axis()
+            .scale(barchartScaleX)
+            .orient("bottom")
+            .ticks(10);
+
+        var barchartScaleYAxis = d3.svg.axis()
+            .scale(barchartScaleY)
+            .orient("left")
+            .ticks(10);
+
+        var barchartSvg = d3.select("body").append("svg")
+            .attr("width", barchartWidth + barchartMargin.left + barchartMargin.right)
+            .attr("height", barchartHeight + barchartMargin.top + barchartMargin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + barchartMargin.left + "," + barchartMargin.top + ")");
+
+        barchartSvg.append("g")
+            .attr("class", "barchartScaleXAxis")
+            .attr("transform", "translate(0," + barchartHeight + ")")
+            .call(barchartScaleXAxis)
+            .attr({
+                'fill': 'none',
+                'stroke': '#000'
+            })
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", ".8em")
+            .attr("dy", ".55em")
+            .attr("transform", "rotate(0)")
+            .attr({
+                'fill': '#000',
+                'stroke': 'none'
             });
 
-        var pieData = [pie(NegcashBuyChange), pie(PoscashBuyChange),
-            pie(NegcashSellChange), pie(PoscashSellChange),
-            pie(NegSightBuyChange), pie(PosSightBuyChange),
-            pie(NegSightSellChange), pie(PosSightSellChange)
-        ];
-        // console.log(pieData);
+        barchartSvg.append("g")
+            .attr("class", "barchartScaleYAxis")
+            .call(barchartScaleYAxis)
+            .attr({
+                'fill': 'none',
+                'stroke': '#000'
+            })
+            .selectAll("text")
+            .attr({
+                'fill': '#000',
+                'stroke': 'none'
+            })
+            .style("text-anchor", "end");
 
-        var pieChartWidth = 320;
-        var pieChartHeight = 400;
+        var barRect = barchartSvg.selectAll(".barRect")
+            .data(NegcashBuyChange);
 
-        var outerRadius = pieChartWidth / 2;
-        var innerRadius = pieChartWidth / 3;
+        barRect.enter().append("rect")
+            .style("fill", (d, i) => {
+                if (whichBtn % 2 == 0)
+                    return countryNegColor(i);
+                else return countryPosColor(i)
+            })
+            .attr("class", "barRect")
+            .attr("x", function(d) { return barchartScaleX(d.country); })
+            .attr("width", barchartScaleX.rangeBand())
+            .attr("y", function(d) { return barchartScaleY(d.changeValue); })
+            .attr("height", function(d) { return barchartHeight - barchartScaleY(d.changeValue); });
 
-        var textOffset = 260;
 
-        var arc = d3.svg.arc()
-            .outerRadius(outerRadius - 50)
-            .innerRadius(innerRadius - 50);
+        ///////////////////
+        var barchartSvg2 = d3.select("body").append("svg")
+            .attr("width", barchartWidth + barchartMargin.left + barchartMargin.right)
+            .attr("height", barchartHeight + barchartMargin.top + barchartMargin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + barchartMargin.left + "," + barchartMargin.top + ")");
 
-        var textArc = d3.svg.arc()
-            .outerRadius(outerRadius + textOffset)
-            .innerRadius(innerRadius + textOffset);
 
-        var pieChartSvgWidth = screen.availWidth * 0.5 - 20;
-        var pieChartSvgHeight = screen.availHeight * 0.94;
 
-        var PieChartSvg = [8];
-        //創造八張圖
-        for (var a = 0; a < 8; ++a) {
-            PieChartSvg[a] = d3.select("body")
-                .append("svg")
-                .attr("width", pieChartSvgWidth)
-                .attr("height", pieChartSvgHeight)
-                .attr("class", "PieChartSvg" + a);
+        /////////
 
-            PieChartSvg[a].append("rect")
-                .attr("width", "100%")
-                .attr("height", "100%")
-                .attr("fill", function() {
-                    if (a == 0 || a == 1) return "#ffffff";
-                    if (a == 2 || a == 3) return "#f7f7f7";
-                    if (a == 4 || a == 5) return "#ffffff";
-                    if (a == 6 || a == 7) return "#f7f7f7";
+
+        d3.select("body").selectAll("button").on("click", function() {
+            for (var i = 0; i < 8; ++i) {
+                // console.log(this.className.split("button")[1][0]);
+                if (this.className.split("button")[1][0] == i) {
+                    whichBtn = i;
+                    console.log(whichBtn);
+                }
+            }
+            updateData2();
+        });
+
+        function updateData2() {
+            dataIsChanging = 1;
+
+            //重新定義一些資料
+            barchartScaleX = d3.scale.ordinal().rangeRoundBands([0, barchartWidth], 0.1).domain(allKindOfRate[whichBtn].map(function(d) { return d.country; }));
+            barchartScaleY = d3.scale.linear().range([barchartHeight, 0]).domain([0, d3.max(allKindOfRate[whichBtn], function(d) { return d.changeValue; })]);
+
+            //更改X,Y軸
+
+            barchartScaleXAxis = d3.svg.axis()
+                .scale(barchartScaleX)
+                .orient("bottom")
+                .ticks(10);
+
+            barchartScaleYAxis = d3.svg.axis()
+                .scale(barchartScaleY)
+                .orient("left")
+                .ticks(10);
+
+            d3.select("body")
+                .transition()
+                .select(".barchartScaleXAxis") // change the x axis
+                .duration(dataChangingTime)
+                .call(barchartScaleXAxis)
+                .attr({
+                    'fill': 'none',
+                    'stroke': '#000'
+                })
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", ".8em")
+                .attr("dy", ".55em")
+                .attr("transform", "rotate(0)")
+                .attr({
+                    'fill': '#000',
+                    'stroke': 'none'
                 });
 
-
-            //繪製弧形
-            var arcs = PieChartSvg[a].selectAll("g.arc")
-                .data(pieData[a])
-                .enter()
-                .append("g") //分組
-                .attr("class", function() {
-                    return "arc";
+            d3.select("body")
+                .transition()
+                .select(".barchartScaleYAxis") // change the y axis
+                .duration(dataChangingTime)
+                .call(barchartScaleYAxis)
+                .attr({
+                    'fill': 'none',
+                    'stroke': '#000'
                 })
-                .attr("transform", "translate(" + (outerRadius + textOffset - 80) + "," + (outerRadius + textOffset - 80) + ")"); //將每組移到中心
+                .selectAll("text")
+                .attr({
+                    'fill': '#000',
+                    'stroke': 'none'
+                })
+                .style("text-anchor", "end");
 
-            //將組中每個元素繪製弧形路徑
-            arcs.append("path") //每個g元素都追加一個path元素用綁訂到這個g的數據d生成路徑訊息
-                .attr("fill", function(d, i) {
-                    if (a % 2 == 0) {
+            barRect.remove();
+
+            //console.log(barRect);
+
+            barRect = barchartSvg.selectAll(".barRect")
+                .data(allKindOfRate[whichBtn]);
+
+            barRect.enter().append("rect")
+                .style("fill", (d, i) => {
+                    if (whichBtn % 2 == 0)
                         return countryNegColor(i);
-                    } else {
-                        return countryPosColor(i);
-                    }
+                    else return countryPosColor(i);
                 })
-                // .attr("stroke-width", "5px")
-                .attr("d", arc)
-                .on("mouseover", function() {
-                    d3.select(this).attr("opacity", 0.8);
-                })
-                .on("mouseout", function() {
-                    d3.select(this).attr("opacity", 1);
-                }); //將角度轉為弧度
+                .attr("class", "barRect")
+                .attr("x", function(d) { return barchartScaleX(d.country); })
+                .attr("width", 0)
+                .attr("y", function(d) { return barchartScaleY(d.changeValue); })
+                .attr("height", 0)
+                .transition()
+                .duration(dataChangingTime)
+                .attr("width", barchartScaleX.rangeBand())
+                .attr("height", function(d) { return barchartHeight - barchartScaleY(d.changeValue); });
+
+        } //updateData2();
 
 
-            var textX, textY, textR, tmpI;
-            //加上文字
-            arcs.append("text")
-                .attr("transform", function(d, i) {
-                    textX = parseFloat(textArc.centroid(d)[0]);
-                    textY = parseFloat(textArc.centroid(d)[1]);
-                    textR = Math.sqrt(Math.pow(Math.abs(textX), 2) + Math.pow(Math.abs(textY), 2));
-                    tmpI = i;
-                    // console.log((textX / 14) * (i + 1), (textY / 14) * (i + 1));
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // var pie = d3.layout.pie()
+        //     .value(function(d) {
+        //         return d.changeValue;
+        //     });
 
-                    //一高一低
-                    // console.log(((textX / 14) * (7)), ((textY / 14) * (7)));
-                    if (i % 2 == 0) return "translate(" + ((textX / 14) * (7)) + "," + ((textY / 14) * (7)) + ")";
-                    else return "translate(" + ((textX / 14) * (10)) + "," + ((textY / 14) * (10)) + ")";
+        // var pieData = [pie(NegcashBuyChange), pie(PoscashBuyChange),
+        //     pie(NegcashSellChange), pie(PoscashSellChange),
+        //     pie(NegSightBuyChange), pie(PosSightBuyChange),
+        //     pie(NegSightSellChange), pie(PosSightSellChange)
+        // ];
+        // // console.log(pieData);
 
-                    //兩段式
-                    // if (tmpI >= 0.5 * NegcashBuyChange.length) tmpI -= 0.5 * NegcashBuyChange.length;
-                    // return "translate(" + ((textX / NegcashBuyChange.length) * (0.5 * NegcashBuyChange.length + tmpI * 0.5)) + "," + ((textY / NegcashBuyChange.length) * (0.5 * NegcashBuyChange.length + tmpI * 0.5)) + ")";
+        // var pieChartWidth = 320;
+        // var pieChartHeight = 400;
 
-                    //大圓
-                    // return "translate(" + textArc.centroid(d) + ")"; //centroid(d)可得出弧形的中心點
-                })
-                .attr("text-anchor", "middle")
-                .attr("font-family", "Noto Sans TC")
-                .text(function(d, i) {
-                    for (var w = 0; w < allCountryName.length; ++w) {
-                        if (d.data.country == allCountryName[w]) {
-                            return chineseCountryName[w];
-                        }
-                    }
-                    // console.log(d.data.country)
-                    // return d.data.country;
-                })
-                .append('tspan') //create a linebreak
-                .attr("x", 0)
-                .attr("y", 20)
-                .attr("text-anchor", "middle")
-                .attr("font-family", "Noto Sans TC")
-                .text(function(d) {
-                    return (d.value * 100).toFixed(3) + "%";
-                });
-            //加上線段
-            arcs.append("line") // attach a line
-                .style("stroke", function(d, i) {
-                    if (a % 2 == 0) {
-                        return countryNegColor(i);
-                    } else {
-                        return countryPosColor(i);
-                    }
-                })
-                .style("stroke-width", 0.5)
-                .attr("x1", function(d, i) {
-                    textX = parseFloat(textArc.centroid(d)[0]);
-                    return 0.25 * textX;
-                })
-                .attr("x2", function(d, i) {
-                    textX = parseFloat(textArc.centroid(d)[0]);
-                    if (i % 2 == 0) {
-                        return 0.42 * textX;
-                    } else {
-                        return 0.65 * textX;
-                    }
+        // var outerRadius = pieChartWidth / 2;
+        // var innerRadius = pieChartWidth / 3;
 
-                })
-                .attr("y1", function(d, i) {
-                    textY = parseFloat(textArc.centroid(d)[1]);
-                    return 0.25 * textY;
-                })
-                .attr("y2", function(d, i) {
-                    textY = parseFloat(textArc.centroid(d)[1]);
-                    if (i % 2 == 0) {
-                        return 0.42 * textY;
-                    } else {
-                        return 0.65 * textY;
-                    }
-                });
+        // var textOffset = 260;
 
-            arcs.append("text")
-                .attr("text-anchor", "middle")
-                .attr('font-size', '18px')
-                .attr("font-family", "Noto Sans TC")
-                .attr('y', 0)
-                .text(function(d, i) {
-                    if (i == 0) { //append一次就好
-                        if (a == 0) return "現金買入跌幅";
-                        if (a == 2) return "現金賣出跌幅";
-                        if (a == 4) return "即期買入跌幅";
-                        if (a == 6) return "即期賣出跌幅";
-                        if (a == 1) return "現金買入漲幅";
-                        if (a == 3) return "現金賣出漲幅";
-                        if (a == 5) return "即期買入漲幅";
-                        if (a == 7) return "即期賣出漲幅";
-                    }
-                });
-            // arcs.append("text")
-            //     .attr("text-anchor", "middle")
-            //     .attr('font-size', '18px')
-            //     .attr("font-family", "Noto Sans TC")
-            //     .attr('y', 0.5 * pieChartSvgHeight - 10)
-            //     .text(function(d, i) {
-            //         if (i == 0) { //append一次就好
-            //             if (a == 0) return "現金買入跌幅";
-            //             if (a == 2) return "現金賣出跌幅";
-            //             if (a == 4) return "即期買入跌幅";
-            //             if (a == 6) return "即期賣出跌幅";
-            //             if (a == 1) return "現金買入漲幅";
-            //             if (a == 3) return "現金賣出漲幅";
-            //             if (a == 5) return "即期買入漲幅";
-            //             if (a == 7) return "即期賣出漲幅";
-            //         }
-            //     });
+        // var arc = d3.svg.arc()
+        //     .outerRadius(outerRadius - 50)
+        //     .innerRadius(innerRadius - 50);
 
-        } //PIE for 
+        // var textArc = d3.svg.arc()
+        //     .outerRadius(outerRadius + textOffset)
+        //     .innerRadius(innerRadius + textOffset);
+
+        // var pieChartSvgWidth = screen.availWidth * 0.5 - 20;
+        // var pieChartSvgHeight = screen.availHeight * 0.94;
+
+        // var PieChartSvg = [8];
+        // //創造八張圖
+        // for (var a = 0; a < 8; ++a) {
+        //     PieChartSvg[a] = d3.select("body")
+        //         .append("svg")
+        //         .attr("width", pieChartSvgWidth)
+        //         .attr("height", pieChartSvgHeight)
+        //         .attr("class", "PieChartSvg" + a);
+
+        //     PieChartSvg[a].append("rect")
+        //         .attr("width", "100%")
+        //         .attr("height", "100%")
+        //         .attr("fill", function() {
+        //             if (a == 0 || a == 1) return "#ffffff";
+        //             if (a == 2 || a == 3) return "#f7f7f7";
+        //             if (a == 4 || a == 5) return "#ffffff";
+        //             if (a == 6 || a == 7) return "#f7f7f7";
+        //         });
+
+
+        //     //繪製弧形
+        //     var arcs = PieChartSvg[a].selectAll("g.arc")
+        //         .data(pieData[a])
+        //         .enter()
+        //         .append("g") //分組
+        //         .attr("class", function() {
+        //             return "arc";
+        //         })
+        //         .attr("transform", "translate(" + (outerRadius + textOffset - 80) + "," + (outerRadius + textOffset - 80) + ")"); //將每組移到中心
+
+        //     //將組中每個元素繪製弧形路徑
+        //     arcs.append("path") //每個g元素都追加一個path元素用綁訂到這個g的數據d生成路徑訊息
+        //         .attr("fill", function(d, i) {
+        //             if (a % 2 == 0) {
+        //                 return countryNegColor(i);
+        //             } else {
+        //                 return countryPosColor(i);
+        //             }
+        //         })
+        //         // .attr("stroke-width", "5px")
+        //         .attr("d", arc)
+        //         .on("mouseover", function() {
+        //             d3.select(this).attr("opacity", 0.8);
+        //         })
+        //         .on("mouseout", function() {
+        //             d3.select(this).attr("opacity", 1);
+        //         }); //將角度轉為弧度
+
+
+        //     var textX, textY, textR, tmpI;
+        //     //加上文字
+        //     arcs.append("text")
+        //         .attr("transform", function(d, i) {
+        //             textX = parseFloat(textArc.centroid(d)[0]);
+        //             textY = parseFloat(textArc.centroid(d)[1]);
+        //             textR = Math.sqrt(Math.pow(Math.abs(textX), 2) + Math.pow(Math.abs(textY), 2));
+        //             tmpI = i;
+        //             // console.log((textX / 14) * (i + 1), (textY / 14) * (i + 1));
+
+        //             //一高一低
+        //             // console.log(((textX / 14) * (7)), ((textY / 14) * (7)));
+        //             if (i % 2 == 0) return "translate(" + ((textX / 14) * (7)) + "," + ((textY / 14) * (7)) + ")";
+        //             else return "translate(" + ((textX / 14) * (10)) + "," + ((textY / 14) * (10)) + ")";
+
+        //             //兩段式
+        //             // if (tmpI >= 0.5 * NegcashBuyChange.length) tmpI -= 0.5 * NegcashBuyChange.length;
+        //             // return "translate(" + ((textX / NegcashBuyChange.length) * (0.5 * NegcashBuyChange.length + tmpI * 0.5)) + "," + ((textY / NegcashBuyChange.length) * (0.5 * NegcashBuyChange.length + tmpI * 0.5)) + ")";
+
+        //             //大圓
+        //             // return "translate(" + textArc.centroid(d) + ")"; //centroid(d)可得出弧形的中心點
+        //         })
+        //         .attr("text-anchor", "middle")
+        //         .attr("font-family", "Noto Sans TC")
+        //         .text(function(d, i) {
+        //             for (var w = 0; w < allCountryName.length; ++w) {
+        //                 if (d.data.country == allCountryName[w]) {
+        //                     return chineseCountryName[w];
+        //                 }
+        //             }
+        //             // console.log(d.data.country)
+        //             // return d.data.country;
+        //         })
+        //         .append('tspan') //create a linebreak
+        //         .attr("x", 0)
+        //         .attr("y", 20)
+        //         .attr("text-anchor", "middle")
+        //         .attr("font-family", "Noto Sans TC")
+        //         .text(function(d) {
+        //             return (d.value * 100).toFixed(3) + "%";
+        //         });
+        //     //加上線段
+        //     arcs.append("line") // attach a line
+        //         .style("stroke", function(d, i) {
+        //             if (a % 2 == 0) {
+        //                 return countryNegColor(i);
+        //             } else {
+        //                 return countryPosColor(i);
+        //             }
+        //         })
+        //         .style("stroke-width", 0.5)
+        //         .attr("x1", function(d, i) {
+        //             textX = parseFloat(textArc.centroid(d)[0]);
+        //             return 0.25 * textX;
+        //         })
+        //         .attr("x2", function(d, i) {
+        //             textX = parseFloat(textArc.centroid(d)[0]);
+        //             if (i % 2 == 0) {
+        //                 return 0.42 * textX;
+        //             } else {
+        //                 return 0.65 * textX;
+        //             }
+
+        //         })
+        //         .attr("y1", function(d, i) {
+        //             textY = parseFloat(textArc.centroid(d)[1]);
+        //             return 0.25 * textY;
+        //         })
+        //         .attr("y2", function(d, i) {
+        //             textY = parseFloat(textArc.centroid(d)[1]);
+        //             if (i % 2 == 0) {
+        //                 return 0.42 * textY;
+        //             } else {
+        //                 return 0.65 * textY;
+        //             }
+        //         });
+
+        //     arcs.append("text")
+        //         .attr("text-anchor", "middle")
+        //         .attr('font-size', '18px')
+        //         .attr("font-family", "Noto Sans TC")
+        //         .attr('y', 0)
+        //         .text(function(d, i) {
+        //             if (i == 0) { //append一次就好
+        //                 if (a == 0) return "現金買入跌幅";
+        //                 if (a == 2) return "現金賣出跌幅";
+        //                 if (a == 4) return "即期買入跌幅";
+        //                 if (a == 6) return "即期賣出跌幅";
+        //                 if (a == 1) return "現金買入漲幅";
+        //                 if (a == 3) return "現金賣出漲幅";
+        //                 if (a == 5) return "即期買入漲幅";
+        //                 if (a == 7) return "即期賣出漲幅";
+        //             }
+        //         });
+        // arcs.append("text")
+        //     .attr("text-anchor", "middle")
+        //     .attr('font-size', '18px')
+        //     .attr("font-family", "Noto Sans TC")
+        //     .attr('y', 0.5 * pieChartSvgHeight - 10)
+        //     .text(function(d, i) {
+        //         if (i == 0) { //append一次就好
+        //             if (a == 0) return "現金買入跌幅";
+        //             if (a == 2) return "現金賣出跌幅";
+        //             if (a == 4) return "即期買入跌幅";
+        //             if (a == 6) return "即期賣出跌幅";
+        //             if (a == 1) return "現金買入漲幅";
+        //             if (a == 3) return "現金賣出漲幅";
+        //             if (a == 5) return "即期買入漲幅";
+        //             if (a == 7) return "即期賣出漲幅";
+        //         }
+        //     });
+
+        // } //PIE for 
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -893,10 +1080,10 @@ d3.csv("history.csv", function(tmpdata) {
         //     .padding(10) //泡泡間的間距
         //     .size([packWidth, packHeight]) //整張圖的寬高
         //     .sort(function(a, b) {
-        //         return b.packValue - a.packValue;
+        //         return b.changeValue - a.changeValue;
         //     })
         //     .value(function(d) {
-        //         return d.packValue;
+        //         return d.changeValue;
         //     });
 
         // //create each packSVG and node
@@ -1067,7 +1254,7 @@ d3.csv("history.csv", function(tmpdata) {
         //             "text-anchor": "middle",
         //         })
         //         .text(function(d) {
-        //             return (d.packValue * 100).toFixed(3) + "%";
+        //             return (d.changeValue * 100).toFixed(3) + "%";
         //         })
         //         .attr("font-family", "sans-serif")
         //         .attr("font-size", "1px")
