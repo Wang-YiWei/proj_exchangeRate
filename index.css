@@ -1,21 +1,19 @@
 body {
+    background-color: rgb(53, 53, 53);
+    /* margin: auto; */
+}
+
+.container-fluid {
     background-color: #f7f7f7;
-    margin: auto;
 }
 
-#lineChart {
-    margin: auto;
+.barChart {
+    background-color: #21294c;
+    /* margin: auto; */
 }
 
-.container1 {
-    /* margin-top: 2%;
-    margin-bottom: 2%; */
-    /* margin-left: 10px; */
-    float: left;
-}
-
-.container3 {
-    clear: both;
+.section2 {
+    background-color: #21294c;
 }
 
 ul {
@@ -24,7 +22,6 @@ ul {
     padding: 0;
     width: 200px;
     background-image: url("img/wood3.jpg");
-    /* background-color: #f1f1f1; */
 }
 
 li a {
@@ -39,12 +36,116 @@ li a.active {
     font-family: Noto Sans TC;
     color: rgba(250, 250, 250, 0.8);
     background-color: #6465A5;
-    /* background-color: rgba(87, 60, 48, 0.8); */
 }
 
 li a:hover:not(.active) {
     font-family: Noto Sans TC;
     background-color: #6465A5;
     color: rgba(250, 250, 250, 0.8);
-    /* background-color: rgba(87, 60, 48, 0.8); */
 }
+
+.button {
+    border: 2px solid #00cf95;
+    color: #00cf95;
+    background-color: #21294c;
+    border-radius: 50px;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    display: block;
+    /* Make the buttons appear below each other */
+}
+
+.button:hover {
+    background-color: #00cf95;
+    color: white;
+    border-radius: 50px;
+}
+
+
+/* 
+.button5 {
+    background-color: white;
+    color: black;
+    border: 2px solid #555555;
+}
+
+.button5:hover {
+    background-color: #555555;
+    color: white;
+} */
+
+
+/* .button0 {
+    background-color: white;
+    color: black;
+    border: 2px solid #4CAF50;
+}
+
+.button0:hover {}
+
+.button1 {
+    background-color: white;
+    color: black;
+    border: 2px solid #008CBA;
+}
+
+.button1:hover {
+    background-color: #008CBA;
+    color: white;
+}
+
+.button2 {
+    background-color: white;
+    color: black;
+    border: 2px solid #f44336;
+}
+
+.button2:hover {
+    background-color: #f44336;
+    color: white;
+}
+
+.button3 {
+    background-color: white;
+    color: black;
+    border: 2px solid #555555;
+}
+
+.button3:hover {
+    background-color: #555555;
+    color: white;
+} */
+
+
+/* button span{
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+} */
+
+
+/* button:hover span {
+    padding-right: 25px;
+}
+
+button:hover span:after {
+    opacity: 1;
+    right: 0;
+} */
