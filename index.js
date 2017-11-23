@@ -1,4 +1,12 @@
-﻿var allCountryName = [
+﻿function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
+
+var allCountryName = [
     'USD', 'HKD', 'GBP', 'AUD', 'CAD', 'SGD', 'CHF', 'JPY', 'ZAR', 'SEK',
     'NZD', 'THB', 'PHP', 'IDR', 'EUR', 'KRW', 'VND', 'MYR', 'CNY'
 ]
@@ -104,6 +112,16 @@ d3.csv("history.csv", function(tmpdata) {
             .attr("text-anchor", "middle")
             .attr("font-family", "Noto Sans TC")
             .attr("font-size", "20px")
+            .attr("fill", "black");
+
+        //標明Y軸單位
+        var yUnitText = linechartsvg.append("text")
+            .attr("x", linechartMargin.left + 20)
+            .attr("y", linechartMargin.top)
+            .text(function(d) { return "(元)"; })
+            .attr("text-anchor", "middle")
+            .attr("font-family", "Noto Sans TC")
+            .attr("font-size", "15px")
             .attr("fill", "black");
 
 
@@ -439,10 +457,10 @@ d3.csv("history.csv", function(tmpdata) {
                                 })
                                 .text(function(d) {
                                     if (j == 0) return dividedCountryData[whichCountry][i].date + "(" + chineseCountryName[whichCountry] + dividedCountryData[whichCountry][i].country + ")";
-                                    if (j == 1) return "現金買入 : " + dividedCountryData[whichCountry][i].historyValue1;
-                                    if (j == 2) return "現金賣出 : " + dividedCountryData[whichCountry][i].historyValue2;
-                                    if (j == 3) return "即期買入 : " + dividedCountryData[whichCountry][i].historyValue3;
-                                    if (j == 4) return "即期賣出 : " + dividedCountryData[whichCountry][i].historyValue4;
+                                    if (j == 1) return "現金買入 : " + dividedCountryData[whichCountry][i].historyValue1 + "元";
+                                    if (j == 2) return "現金賣出 : " + dividedCountryData[whichCountry][i].historyValue2 + "元";
+                                    if (j == 3) return "即期買入 : " + dividedCountryData[whichCountry][i].historyValue3 + "元";
+                                    if (j == 4) return "即期賣出 : " + dividedCountryData[whichCountry][i].historyValue4 + "元";
                                 });
                         }
                         //console.log("Shining: dot" + i);
@@ -593,7 +611,7 @@ d3.csv("history.csv", function(tmpdata) {
         } //updateData();
 
         var MenuActive;
-        d3.selectAll("ul li a")
+        d3.selectAll("li a")
             .on("click", function() {
                 //update active class
                 MenuActive = document.getElementsByClassName("menu active");
@@ -851,14 +869,19 @@ d3.csv("history.csv", function(tmpdata) {
                 .attr("class", "barRect")
                 .attr("x", function(d) { return barchartScaleX(d.country); })
                 .attr("y", function(d) {
+                    // if (d.changeValue > 0) return barchartScaleY(0) - (Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0)));
+                    // else return barchartScaleY(0);
+
+                    return barchartScaleY(0);
+                })
+                .attr("width", barchartScaleX.rangeBand())
+                .attr("height", 0)
+                .transition()
+                .duration(dataChangingTime)
+                .attr("y", function(d) {
                     if (d.changeValue > 0) return barchartScaleY(0) - (Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0)));
                     else return barchartScaleY(0);
                 })
-                .attr("width", 0)
-                .attr("height", function(d) { return Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0)) })
-                .transition()
-                .duration(dataChangingTime)
-                .attr("width", barchartScaleX.rangeBand())
                 .attr("height", function(d) { return Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0)) });
 
             d3.select("body")
@@ -878,6 +901,14 @@ d3.csv("history.csv", function(tmpdata) {
                 .style("text-anchor", "end");
 
             /////////////////
+
+            // barchartSvg.transition()
+            //     .duration(dataChangingTime)
+            //     .select(".barchartScaleXAxis")
+            //     .call(barchartScaleXAxis)
+            //     .selectAll("g");
+
+            /////////////////////////////// original x axis
 
             d3.select(".barchartScaleXAxis").remove();
 
@@ -901,17 +932,6 @@ d3.csv("history.csv", function(tmpdata) {
                     'stroke': axisColor //Y軸字體顏色
                 });
 
-
-
-            // .attr("stroke", function(d, i) {
-            //     if (d.changeValue > 0) return deepColor1;
-            //     else return deepColor2;
-            // })
-            // .attr("fill", function(d, i) {
-            //     if (d.changeValue > 0) return deepColor1;
-            //     else return deepColor2;
-            // });
-
             tickNegative = allTick.selectAll('.tick')
                 .attr("class", "tickNegative")
                 .filter(function(d, i) { return allKindOfRate[whichBtn][i].changeValue < 0; });
@@ -919,12 +939,7 @@ d3.csv("history.csv", function(tmpdata) {
             tickNegative.select('line')
                 .attr('y2', -6);
 
-            // tickNegative.select('text')
-            //     .attr("dy", "-1.3em")
-            //     .attr({
-            //         'fill': axisColor,
-            //         'stroke': axisColor //字體顏色
-            //     });
+
             tickNegative.select('text')
                 .attr("dy", "-1.3em")
                 .attr("stroke", function(d, i) {
@@ -935,7 +950,7 @@ d3.csv("history.csv", function(tmpdata) {
                     if (d.changeValue > 0) return deepColor1;
                     else return deepColor2;
                 });
-
+            /////////////////////////////// original x axis
             /////////////////////
 
         } //updateData2();
