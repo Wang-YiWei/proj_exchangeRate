@@ -13,7 +13,7 @@ body {
 }
 
 .section2 {
-    background-color: #21294c;
+    /* background-color: #21294c; */
 }
 
 ul {
@@ -45,6 +45,7 @@ li a:hover:not(.active) {
 }
 
 .button {
+    font-family: Noto Sans TC;
     border: 2px solid #00cf95;
     color: #00cf95;
     background-color: #21294c;
@@ -63,9 +64,16 @@ li a:hover:not(.active) {
 }
 
 .button:hover {
+    font-family: Noto Sans TC;
     background-color: #00cf95;
     color: white;
     border-radius: 50px;
+}
+
+.button.active {
+    font-family: Noto Sans TC;
+    background-color: #00cf95;
+    color: white;
 }
 
 .sidenav {

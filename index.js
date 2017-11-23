@@ -48,8 +48,11 @@ d3.csv("history.csv", function(tmpdata) {
 
         var linechartMargin = { top: 30, right: 50, bottom: 70, left: 50 };
 
-        var linechartWidth = 0.9 * $('.col-lg-8').width() - linechartMargin.left - linechartMargin.right;
-        var linechartHeight = 0.6 * $('.col-lg-8').width() - linechartMargin.top - linechartMargin.bottom;
+        var linechartWidth = 0.6 * window.innerWidth - linechartMargin.left - linechartMargin.right;
+        var linechartHeight = 600 - linechartMargin.top - linechartMargin.bottom;
+
+        // var linechartWidth = 0.9 * $('.col-lg-8').width() - linechartMargin.left - linechartMargin.right;
+        // var linechartHeight = 0.6 * $('.col-lg-8').width() - linechartMargin.top - linechartMargin.bottom;
 
         //define max and min value.
         var minX = d3.min(dividedCountryData[whichCountry], function(d) { return parseInt(d.x) }),
@@ -70,7 +73,7 @@ d3.csv("history.csv", function(tmpdata) {
             maxdate = new Date(dividedCountryData[0][0].date);
 
         //創造畫布
-        var linechartsvg = d3.select('.linechartContainer')
+        var linechartsvg = d3.select('.chart1')
             .append('svg')
             .attr('id', 's');
 
@@ -616,7 +619,7 @@ d3.csv("history.csv", function(tmpdata) {
                 //update active class
                 MenuActive = document.getElementsByClassName("menu active");
                 MenuActive[0].className = "menu";
-                this.className += " active "
+                this.className += " active ";
                 for (var i = 0; i < allCountryName.length; ++i) {
                     if (this.id.split("btn")[1] == allCountryName[i]) {
                         whichCountry = i;
@@ -698,7 +701,7 @@ d3.csv("history.csv", function(tmpdata) {
             if (allKindOfRate[whichBtn][i].changeValue > 0) PosNum++;
             else NegNum++;
         }
-        console.log(NegNum);
+        // console.log(NegNum);
 
         /* Create gradient color */
         var deepColor1 = "#00cf95",
@@ -725,8 +728,8 @@ d3.csv("history.csv", function(tmpdata) {
         else barchartHeight = window.innerHeight - barchartMargin.top - barchartMargin.bottom;
         $(".section2").width(window.availWidth);
         $(".section2").height(window.innerHeight);
-        console.log(window.innerHeight);
-        console.log(barchartHeight);
+        // console.log(window.innerHeight);
+        // console.log(barchartHeight);
 
         var barchartSvg = d3.select(".barChart").append("svg")
             .attr("width", barchartWidth + barchartMargin.left + barchartMargin.right)
@@ -746,7 +749,8 @@ d3.csv("history.csv", function(tmpdata) {
         var barchartScaleYAxis = d3.svg.axis()
             .scale(barchartScaleY)
             .orient("left")
-            .ticks(10);
+            .ticks(10)
+            .tickFormat(function(d) { return 100 * d + '%'; });
 
 
         var barRect = barchartSvg.selectAll(".barRect")
@@ -811,12 +815,16 @@ d3.csv("history.csv", function(tmpdata) {
             })
             .style("text-anchor", "end");
 
-
-        d3.select("body").selectAll("button").on("click", function() {
+        var buttonActive2;
+        d3.selectAll("button").on("click", function() {
             for (var i = 0; i < 4; ++i) {
+                // console.log($(this).attr('id'));
                 // console.log(this.className.split("button")[1][0]);
-                if (this.className.split("button")[1][0] == i) {
+                if (this.id.split("button")[1][0] == i) {
                     whichBtn = i;
+                    buttonActive2 = document.getElementsByClassName("button active");
+                    buttonActive2[0].className = "button";
+                    this.className += " active ";
                 }
             }
             updateData2();
@@ -829,7 +837,7 @@ d3.csv("history.csv", function(tmpdata) {
                 if (allKindOfRate[whichBtn][i].changeValue > 0) PosNum++;
                 else NegNum++;
             }
-            console.log(PosNum);
+            // console.log(PosNum);
 
             countryPosColor = d3.scale
                 .linear()
@@ -853,8 +861,9 @@ d3.csv("history.csv", function(tmpdata) {
             barchartScaleYAxis = d3.svg.axis()
                 .scale(barchartScaleY)
                 .orient("left")
-                .ticks(10);
-
+                .ticks(10)
+                .tickFormat(function(d) { return 100 * parseFloat(d).toFixed(4).valueOf() + '%'; });
+            console.log("format");
             barRect.remove();
 
             barRect = barchartSvg.selectAll(".barRect")
