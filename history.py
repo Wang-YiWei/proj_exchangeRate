@@ -20,7 +20,7 @@ fptr.write('\n')
 
 for i in range(0,19):
     res = requests.get('http://rate.bot.com.tw/xrt/quote/ltm/'+allCountry[i])
-    soup = BeautifulSoup(res.text)
+    soup = BeautifulSoup(res.text, "lxml")
     tbody = soup.select('tbody')[0]
     tr = tbody.select('tr')
     
