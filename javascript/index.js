@@ -19,13 +19,14 @@ var entireHistoryData = []; //contains more than 1000 indices
 var dividedCountryData = []; // contain 19 indices . Each index contains latest 3-month data. 
 
 for (var i = 0; i < allCountryName.length; ++i) {
+
     //  dividedCountryData[0] contains latest 3-months of USA. dividedCountryData[1] contains latest 3-months of HKD , dividedCountryData[2].....and so on.
     dividedCountryData[i] = [];
 }
 
 var dataIsChanging = 0;
-
-d3.csv("history.csv", function (tmpdata) {
+console.log("inin");
+d3.csv("./data/history.csv", function (tmpdata) {
     tmpdata.forEach(function (d) {
         d.x = parseInt(d.x, 10);
         d.data = new Date(d.date);
@@ -42,15 +43,14 @@ d3.csv("history.csv", function (tmpdata) {
             if (entireHistoryData[i].country == allCountryName[j]) {
                 dividedCountryData[j].push(entireHistoryData[i]);
             }
-
         }
     }
+
     //reverse x so that the date can order from left to right
     for (var i = 0; i < allCountryName.length; ++i) {
         for (var j = 0; j < dividedCountryData[i].length; ++j) {
             dividedCountryData[i][j].x = dividedCountryData[i].length - dividedCountryData[i][j].x - 1; //i代表哪一個國家，j代表哪一天
             dividedCountryData[i][j].date = dividedCountryData[i][j].date.replace(/\//g, "-"); //turn yyyy/mm/dd to yyyy-mm-dd
-            //console.log(dividedCountryData[i][j].x);
         }
     }
     var whichCountry = 0;
@@ -64,9 +64,6 @@ d3.csv("history.csv", function (tmpdata) {
 
     var linechartWidth = 0.6 * window.innerWidth - linechartMargin.left - linechartMargin.right;
     var linechartHeight = 600 - linechartMargin.top - linechartMargin.bottom;
-
-    // var linechartWidth = 0.9 * $('.col-lg-8').width() - linechartMargin.left - linechartMargin.right;
-    // var linechartHeight = 0.6 * $('.col-lg-8').width() - linechartMargin.top - linechartMargin.bottom;
 
     //define max and min value.
     var minX = d3.min(dividedCountryData[whichCountry], function (d) {
@@ -91,7 +88,7 @@ d3.csv("history.csv", function (tmpdata) {
         maxdate = new Date(dividedCountryData[0][0].date);
 
     //創造畫布
-    var linechartsvg = d3.select('.chart1')
+    var linechartsvg = d3.select('.linechart')
         .append('svg')
         .attr('id', 's');
 
@@ -284,7 +281,6 @@ d3.csv("history.csv", function (tmpdata) {
         .attr({
             'fill': 'none',
             'stroke': 'rgba(170,170,170,0.15)',
-            // 'stroke': 'rgba(0,0,0,.1)',
             'transform': 'translate(' + (linechartMargin.left) + ', ' + (linechartHeight + linechartMargin.top) + ')'
         });
     //繪出Y軸標格
@@ -293,7 +289,6 @@ d3.csv("history.csv", function (tmpdata) {
         .attr({
             'fill': 'none',
             'stroke': 'rgba(170,170,170,0.15)',
-            // 'stroke': 'rgba(0,0,0,.1)',
             'transform': 'translate(' + (linechartMargin.left) + ',' + (linechartMargin.top) + ')'
         });
     //繪出X軸
@@ -374,7 +369,6 @@ d3.csv("history.csv", function (tmpdata) {
             })
             .attr('r', originR);
     }
-    //console.log(dots[1]);
 
     //繪出圓點資訊
     var shineDuration = 400;
@@ -416,7 +410,6 @@ d3.csv("history.csv", function (tmpdata) {
     //跟著滑鼠跑的那條線的Function
     var dotIsShining = 0; //判斷是否有某資料點正在閃爍
     var shineDistance = 3;
-    //console.log(dividedCountryData[8][0].historyValue1);
 
     function linechartMove(d, i) {
         if (dataIsChanging == 0) {
@@ -426,6 +419,7 @@ d3.csv("history.csv", function (tmpdata) {
             for (var i = 0; i < dividedCountryData[whichCountry].length; ++i) {
                 if (Math.abs(mousePosOnLinechart[0] - (scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left)) < shineDistance) {
                     dotIsShining++;
+
                     //讓點反覆閃爍
                     d3.selectAll(".dots" + i)
                         .attr({
@@ -453,12 +447,10 @@ d3.csv("history.csv", function (tmpdata) {
                         .delay(10)
                         .attr('opacity', 0.4)
                         .attr("x", function () {
-                            // console.log(i);
                             if (i < 0.5 * dividedCountryData[whichCountry].length) return (scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left) - infoWidth;
                             else return (scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left);
                         })
                         .attr("y", function () {
-                            //console.log((scaleY(dividedCountryData[whichCountry][i].historyValue2) - offsetY));
                             if (dividedCountryData[whichCountry][0].historyValue2 == 0) {
                                 return (scaleY(dividedCountryData[whichCountry][i].historyValue4) + linechartMargin.top);
                             }
@@ -488,7 +480,6 @@ d3.csv("history.csv", function (tmpdata) {
                                 if (j == 4) return "即期賣出 : " + dividedCountryData[whichCountry][i].historyValue4 + "元";
                             });
                     }
-                    //console.log("Shining: dot" + i);
                 } else if (dotIsShining != 0) { //當有某資料點正在閃爍且滑鼠離該資料點的x軸距離大於10的時候
                     //讓閃爍的點恢復成原來的樣子
                     //透過filter篩選class裡的class，還原正確的顏色
@@ -609,7 +600,6 @@ d3.csv("history.csv", function (tmpdata) {
                         return scaleX(dividedCountryData[whichCountry][i].x) + linechartMargin.left;
                     })
                     .attr('cy', function (d) {
-                        //console.log(scaleY(dividedCountryData[whichCountry][i].historyValue2) - offsetY);
                         if (j == 0) return scaleY(dividedCountryData[whichCountry][i].historyValue1) + linechartMargin.top;
                         else if (j == 1) return scaleY(dividedCountryData[whichCountry][i].historyValue2) + linechartMargin.top;
                         else if (j == 2) return scaleY(dividedCountryData[whichCountry][i].historyValue3) + linechartMargin.top;
@@ -651,12 +641,12 @@ d3.csv("history.csv", function (tmpdata) {
             for (var i = 0; i < allCountryName.length; ++i) {
                 if (this.id.split("btn")[1] == allCountryName[i]) {
                     whichCountry = i;
-                    //console.log(whichCountry);
                 }
             }
             updateData();
         })
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     /* --- Bar chart --- */
 
     /* arrange data for bar chart */
@@ -765,10 +755,10 @@ d3.csv("history.csv", function (tmpdata) {
     }
 
     /* Create gradient color */
-    var deepColor1 = "#00cf95",
-        lightColor1 = "#FFF3DE",
-        deepColor2 = "#4d6de3",
-        lightColor2 = "#f1fcfd";
+    var deepColor1 = "steelblue",
+        lightColor1 = "#D5EEFF",
+        deepColor2 = "#F67280",
+        lightColor2 = "#FFFDE1";
 
     var countryPosColor = d3.scale
         .linear()
@@ -779,7 +769,7 @@ d3.csv("history.csv", function (tmpdata) {
         .domain([0, NegNum])
         .range([lightColor2, deepColor2]);
 
-    var axisColor = "#00cf95";
+    var axisColor = "#6E6E6E";
 
     /* Start to draw */
     var barchartMargin = {
@@ -847,7 +837,7 @@ d3.csv("history.csv", function (tmpdata) {
 
     var originAxisX = barchartScaleY(0);
     var allTick = barchartSvg.append("g")
-        .data(allKindOfRate[whichBtn])
+        // .data(allKindOfRate[whichBtn])
         .attr("class", "barchartScaleXAxis")
         .attr("transform", "translate(0," + barchartScaleY(0) + ")")
         .style("z-index", 100)
@@ -855,9 +845,19 @@ d3.csv("history.csv", function (tmpdata) {
         .attr('fill', 'none')
         .attr('stroke', function (d) {
             //tick顏色
-            // console.log(d.changeValue);
-            if (d.changeValue > 0) return deepColor1;
-            else return deepColor2;
+            return axisColor;
+            // if (d.changeValue > 0) return deepColor1;
+            // else return deepColor2;
+        });
+
+    allTick.selectAll('text')
+        .data(allKindOfRate[whichBtn])
+
+        .attr('stroke', 'none')
+        .attr('fill', function (d) {
+            return axisColor;            
+            // if (d.changeValue > 0) return deepColor1;
+            // else return deepColor2;
         });
 
     var tickNegative = allTick.selectAll('.tick')
@@ -876,12 +876,14 @@ d3.csv("history.csv", function (tmpdata) {
         .duration(dataChangingTime)
         .attr("dy", "-1.3em")
         .attr("stroke", function (d, i) {
-            if (d.changeValue > 0) return deepColor1;
-            else return deepColor2;
+            return 'none';
+            // if (d.changeValue > 0) return deepColor1;
+            // else return deepColor2;
         })
         .attr("fill", function (d, i) {
-            if (d.changeValue > 0) return deepColor1;
-            else return deepColor2;
+            return axisColor;            
+            // if (d.changeValue > 0) return deepColor1;
+            // else return deepColor2;
         });
 
     barchartSvg.append("g")
@@ -894,7 +896,7 @@ d3.csv("history.csv", function (tmpdata) {
         .selectAll("text")
         .attr({
             'fill': axisColor,
-            'stroke': axisColor //字體顏色
+            'stroke': 'none' //字體顏色
         })
         .style("text-anchor", "end");
 
@@ -1020,7 +1022,7 @@ d3.csv("history.csv", function (tmpdata) {
             .selectAll("text")
             .attr({
                 'fill': axisColor,
-                'stroke': axisColor //字體顏色
+                'stroke': 'none' //字體顏色
             })
             .style("text-anchor", "end");
 
@@ -1067,7 +1069,7 @@ d3.csv("history.csv", function (tmpdata) {
         allTick.selectAll("text")
             .attr({
                 'fill': axisColor,
-                'stroke': axisColor //Y軸字體顏色
+                'stroke': 'none' //Y軸字體顏色
             });
 
         tickNegative = allTick.selectAll('.tick')
@@ -1083,12 +1085,14 @@ d3.csv("history.csv", function (tmpdata) {
         tickNegative.select('text')
             .attr("dy", "-1.3em")
             .attr("stroke", function (d, i) {
-                if (d.changeValue > 0) return deepColor1;
-                else return deepColor2;
+                return 'none';
+                // if (d.changeValue > 0) return deepColor1;
+                // else return deepColor2;
             })
             .attr("fill", function (d, i) {
-                if (d.changeValue > 0) return deepColor1;
-                else return deepColor2;
+                return axisColor;
+                // if (d.changeValue > 0) return deepColor1;
+                // else return deepColor2;
             });
 
     } //updateData2();
