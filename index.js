@@ -856,6 +856,7 @@ d3.csv("history.csv", function (tmpdata) {
     var allTick = barchartSvg.append("g")
         .attr("class", "barchartScaleXAxis")
         .attr("transform", "translate(0," + barchartScaleY(0) + ")")
+        .style("z-index", 100)
         .call(barchartScaleXAxis)
         .attr({
             'fill': 'none',
@@ -869,14 +870,17 @@ d3.csv("history.csv", function (tmpdata) {
 
     var tickNegative = allTick.selectAll('.tick')
         .attr("class", "tickNegative")
+        .style("z-index", 100)
         .filter(function (d, i) {
             return allKindOfRate[whichBtn][i].changeValue < 0;
         });
 
     tickNegative.select('line')
+        .style("z-index", 100)
         .attr('y2', -6);
 
     tickNegative.select('text')
+        .style("z-index", 100)
         .attr("dy", "-1.3em")
         .attr({
             'fill': axisColor,
@@ -932,7 +936,6 @@ d3.csv("history.csv", function (tmpdata) {
             return d.country;
         }));
         barchartScaleY = d3.scale.linear().range([barchartHeight, 0]).domain(d3.extent(allKindOfRate[whichBtn], function (d) {
-            console.log(parseFloat(d.changeValue).toFixed(2));
             return parseFloat(d.changeValue).toFixed(2);
         }));
 
@@ -951,6 +954,7 @@ d3.csv("history.csv", function (tmpdata) {
             });
 
 
+        // 移除多餘的bar
         var barRect1 = barchartSvg.selectAll(".barRect")
             .data(allKindOfRate[whichBtn]);
 
@@ -979,6 +983,7 @@ d3.csv("history.csv", function (tmpdata) {
             .duration(dataChangingTime)
             .attr('opacity', 0).remove();
 
+        // 增加新bar            
         var barRect2 = barchartSvg.selectAll(".barRect")
             .data(allKindOfRate[whichBtn]);
 
@@ -991,6 +996,7 @@ d3.csv("history.csv", function (tmpdata) {
                     return countryPosColor(i);
                 } else return countryNegColor(i - PosNum + 1);
             })
+            .style("z-index", -10)
             .attr("class", "barRect")
             .attr("x", function (d) {
                 return barchartScaleX(d.country);
@@ -1004,10 +1010,11 @@ d3.csv("history.csv", function (tmpdata) {
                 return Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0));
             });
 
-
-        d3.select('.barchartScaleYAxis').remove();
-        barchartSvg.append("g")
-            .attr("class", "barchartScaleYAxis")
+        // Y軸漸變
+        d3.select("body")
+            .transition()
+            .select(".barchartScaleYAxis") // change the y axis
+            .duration(dataChangingTime)
             .call(barchartScaleYAxis)
             .attr({
                 'fill': 'none',
@@ -1020,34 +1027,32 @@ d3.csv("history.csv", function (tmpdata) {
             })
             .style("text-anchor", "end");
 
-        // d3.select("body")
-        //     .transition()
-        //     .select(".barchartScaleYAxis") // change the y axis
-        //     .duration(dataChangingTime)
-        //     .call(barchartScaleYAxis)
-        //     .attr({
-        //         'fill': 'none',
-        //         'stroke': axisColor //字體顏色
-        //     })
-        //     .selectAll("text")
-        //     .attr({
-        //         'fill': axisColor,
-        //         'stroke': axisColor //字體顏色
-        //     })
-        //     .style("text-anchor", "end");
 
-        /////////////////
+        /**
+         * 
+         * TOFIXED: x軸tick會被新append的rect蓋掉
+         * 暫時解法：重新繪出x軸
+         * 
+         */
 
         // barchartSvg.transition()
         //     .duration(dataChangingTime)
         //     .select(".barchartScaleXAxis")
         //     .call(barchartScaleXAxis)
-        //     .selectAll("g");
+        //     .attr("transform", "translate(0," + barchartScaleY(0) + ")")
+        //     .style("z-index", 100)
+        //     .selectAll("text")
+        //     .attr({
+        //         'fill': axisColor,
+        //         'stroke': axisColor //Y軸字體顏色
+        //     });
 
-        /////////////////////////////// original x axis
+        // barchartSvg.order();
+        // barRect2.order();
 
+
+        // x軸重新繪出
         d3.select(".barchartScaleXAxis").remove();
-
         allTick = barchartSvg.append("g")
             .attr("class", "barchartScaleXAxis")
             .attr({
