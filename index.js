@@ -819,7 +819,7 @@ d3.csv("history.csv", function (tmpdata) {
         .orient("left")
         .ticks(10)
         .tickFormat(function (d) {
-            return d + '%';
+            return parseFloat(parseFloat(d).toFixed(2)) + '%';
         });
 
 
@@ -912,6 +912,7 @@ d3.csv("history.csv", function (tmpdata) {
     });
 
     function updateData2() {
+
         PosNum = 0;
         NegNum = 0;
         for (var i = 0; i < allKindOfRate[whichBtn].length; ++i) {
@@ -934,7 +935,7 @@ d3.csv("history.csv", function (tmpdata) {
         }));
         barchartScaleY = d3.scale.linear().range([barchartHeight, 0]).domain(d3.extent(allKindOfRate[whichBtn], function (d) {
             return parseFloat(d.changeValue);
-        })).nice();
+        }));
 
         //更改X,Y軸
         barchartScaleXAxis = d3.svg.axis()
@@ -946,11 +947,10 @@ d3.csv("history.csv", function (tmpdata) {
             .scale(barchartScaleY)
             .orient("left")
             .ticks(10)
-            .tickFormat(function (d) {
-                return d + '%';
+            .tickFormat(function (d, i) {
+                return parseFloat(parseFloat(d).toFixed(2)) + '%';
             });
 
-        console.clear();
 
         // 移除多餘的bar
         var barRect1 = barchartSvg.selectAll(".barRect")
@@ -972,8 +972,6 @@ d3.csv("history.csv", function (tmpdata) {
                 else return barchartScaleY(0);
             })
             .attr("height", function (d) {
-                console.log(d.changeValue);
-                // console.log(Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0)));
                 return Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0));
             });
 
@@ -1094,7 +1092,5 @@ d3.csv("history.csv", function (tmpdata) {
             });
 
     } //updateData2();
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
 
 }) //d3.csv
