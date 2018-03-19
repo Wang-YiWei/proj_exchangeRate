@@ -149,8 +149,6 @@ d3.csv("history.csv", function (tmpdata) {
         .attr("font-size", "15px")
         .attr("fill", "black");
 
-
-
     //將縮放後的資料放進lines這個變數裡
     var lines = [4]; //4種匯率的4種折線
     for (var i = 0; i < 4; ++i) {
@@ -752,10 +750,6 @@ d3.csv("history.csv", function (tmpdata) {
 
     var PosNum = 0,
         NegNum = 0;
-    // var PosArr = [PoscashBuyChange.length, PoscashSellChange.length, PosSightBuyChange.length, PosSightSellChange.length];
-    // var PosNum = d3.max(PosArr);
-    // var NegArr = [NegcashBuyChange.length, NegcashSellChange.length, NegSightBuyChange.length, NegSightSellChange.length];
-    // var NegNum = d3.max(NegArr);
 
     var allKindOfRate = [cashBuyChange, cashSellChange, sightBuyChange, sightSellChange];
 
@@ -769,7 +763,6 @@ d3.csv("history.csv", function (tmpdata) {
         if (allKindOfRate[whichBtn][i].changeValue > 0) PosNum++;
         else NegNum++;
     }
-    // console.log(NegNum);
 
     /* Create gradient color */
     var deepColor1 = "#00cf95",
@@ -854,18 +847,17 @@ d3.csv("history.csv", function (tmpdata) {
 
     var originAxisX = barchartScaleY(0);
     var allTick = barchartSvg.append("g")
+        .data(allKindOfRate[whichBtn])
         .attr("class", "barchartScaleXAxis")
         .attr("transform", "translate(0," + barchartScaleY(0) + ")")
         .style("z-index", 100)
         .call(barchartScaleXAxis)
-        .attr({
-            'fill': 'none',
-            'stroke': axisColor //tick顏色
-        })
-        .selectAll("text")
-        .attr({
-            'fill': axisColor,
-            'stroke': axisColor //Y軸字體顏色
+        .attr('fill', 'none')
+        .attr('stroke', function (d) {
+            //tick顏色
+            // console.log(d.changeValue);
+            if (d.changeValue > 0) return deepColor1;
+            else return deepColor2;
         });
 
     var tickNegative = allTick.selectAll('.tick')
@@ -880,11 +872,16 @@ d3.csv("history.csv", function (tmpdata) {
         .attr('y2', -6);
 
     tickNegative.select('text')
-        .style("z-index", 100)
+        .transition()
+        .duration(dataChangingTime)
         .attr("dy", "-1.3em")
-        .attr({
-            'fill': axisColor,
-            'stroke': axisColor //字體顏色
+        .attr("stroke", function (d, i) {
+            if (d.changeValue > 0) return deepColor1;
+            else return deepColor2;
+        })
+        .attr("fill", function (d, i) {
+            if (d.changeValue > 0) return deepColor1;
+            else return deepColor2;
         });
 
     barchartSvg.append("g")
@@ -937,7 +934,7 @@ d3.csv("history.csv", function (tmpdata) {
         }));
         barchartScaleY = d3.scale.linear().range([barchartHeight, 0]).domain(d3.extent(allKindOfRate[whichBtn], function (d) {
             return parseFloat(d.changeValue).toFixed(2);
-        }));
+        })).nice();
 
         //更改X,Y軸
         barchartScaleXAxis = d3.svg.axis()
