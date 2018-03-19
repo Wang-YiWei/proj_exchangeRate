@@ -680,68 +680,68 @@ d3.csv("history.csv", function (tmpdata) {
             if ((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1 > 0) {
                 PoscashBuyChange.push({
                     country: allCountryName[i],
-                    changeValue: parseFloat((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1) * 100
+                    changeValue: parseFloat((parseFloat((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) * 100 / dividedCountryData[i][1].historyValue1)).toFixed(2))
                 });
             } else {
                 NegcashBuyChange.push({
                     country: allCountryName[i],
-                    changeValue: parseFloat(Math.abs((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1)) * 100
+                    changeValue: parseFloat((parseFloat(Math.abs((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) * 100 / dividedCountryData[i][1].historyValue1))).toFixed(2))
                 });
             }
             cashBuyChange.push({
                 country: allCountryName[i],
-                changeValue: parseFloat((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) / dividedCountryData[i][1].historyValue1) * 100
+                changeValue: parseFloat((parseFloat((dividedCountryData[i][0].historyValue1 - dividedCountryData[i][1].historyValue1) * 100 / dividedCountryData[i][1].historyValue1)).toFixed(2))
             });
         }
         if (dividedCountryData[i][1].historyValue2 != 0 && (dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) != 0) {
             if ((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2 > 0) {
                 PoscashSellChange.push({
                     country: allCountryName[i],
-                    changeValue: parseFloat((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2) * 100
+                    changeValue: parseFloat((parseFloat((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) * 100 / dividedCountryData[i][1].historyValue2)).toFixed(2))
                 });
             } else {
                 NegcashSellChange.push({
                     country: allCountryName[i],
-                    changeValue: parseFloat(Math.abs((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2)) * 100
+                    changeValue: parseFloat((parseFloat(Math.abs((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) * 100 / dividedCountryData[i][1].historyValue2))).toFixed(2))
                 });
             }
             cashSellChange.push({
                 country: allCountryName[i],
-                changeValue: parseFloat((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) / dividedCountryData[i][1].historyValue2) * 100
+                changeValue: parseFloat((parseFloat((dividedCountryData[i][0].historyValue2 - dividedCountryData[i][1].historyValue2) * 100 / dividedCountryData[i][1].historyValue2)).toFixed(2))
             });
         }
         if (dividedCountryData[i][1].historyValue3 != 0 && (dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) != 0) {
             if ((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3 > 0) {
                 PosSightBuyChange.push({
                     country: allCountryName[i],
-                    changeValue: parseFloat((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3) * 100
+                    changeValue: parseFloat((parseFloat((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) * 100 / dividedCountryData[i][1].historyValue3)).toFixed(2))
                 });
             } else {
                 NegSightBuyChange.push({
                     country: allCountryName[i],
-                    changeValue: parseFloat(Math.abs((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3)) * 100
+                    changeValue: parseFloat((parseFloat(Math.abs((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) * 100 / dividedCountryData[i][1].historyValue3))).toFixed(2))
                 });
             }
             sightBuyChange.push({
                 country: allCountryName[i],
-                changeValue: parseFloat((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) / dividedCountryData[i][1].historyValue3) * 100
+                changeValue: parseFloat((parseFloat((dividedCountryData[i][0].historyValue3 - dividedCountryData[i][1].historyValue3) * 100 / dividedCountryData[i][1].historyValue3)).toFixed(2))
             });
         }
         if (dividedCountryData[i][1].historyValue4 != 0 && (dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) != 0) {
             if ((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4 > 0) {
                 PosSightSellChange.push({
                     country: allCountryName[i],
-                    changeValue: parseFloat((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4) * 100
+                    changeValue: parseFloat((parseFloat((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) * 100 / dividedCountryData[i][1].historyValue4)).toFixed(2))
                 });
             } else {
                 NegSightSellChange.push({
                     country: allCountryName[i],
-                    changeValue: parseFloat(Math.abs((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4)) * 100
+                    changeValue: parseFloat((parseFloat(Math.abs((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) * 100 / dividedCountryData[i][1].historyValue4))).toFixed(2))
                 });
             }
             sightSellChange.push({
                 country: allCountryName[i],
-                changeValue: parseFloat((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) / dividedCountryData[i][1].historyValue4) * 100
+                changeValue: parseFloat((parseFloat((dividedCountryData[i][0].historyValue4 - dividedCountryData[i][1].historyValue4) * 100 / dividedCountryData[i][1].historyValue4)).toFixed(2))
             });
         }
     }
@@ -933,7 +933,7 @@ d3.csv("history.csv", function (tmpdata) {
             return d.country;
         }));
         barchartScaleY = d3.scale.linear().range([barchartHeight, 0]).domain(d3.extent(allKindOfRate[whichBtn], function (d) {
-            return parseFloat(d.changeValue).toFixed(2);
+            return parseFloat(d.changeValue);
         })).nice();
 
         //更改X,Y軸
@@ -950,11 +950,11 @@ d3.csv("history.csv", function (tmpdata) {
                 return d + '%';
             });
 
+        console.clear();
 
         // 移除多餘的bar
         var barRect1 = barchartSvg.selectAll(".barRect")
             .data(allKindOfRate[whichBtn]);
-
         barRect1.transition()
             .duration(dataChangingTime)
             .style("fill", (d, i) => {
@@ -972,6 +972,8 @@ d3.csv("history.csv", function (tmpdata) {
                 else return barchartScaleY(0);
             })
             .attr("height", function (d) {
+                console.log(d.changeValue);
+                // console.log(Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0)));
                 return Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0));
             });
 
