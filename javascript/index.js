@@ -771,12 +771,12 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
         /* Start to draw */
         var barchartMargin = {
-            top: 100,
+            top: 50,
             right: 20,
             bottom: 100,
             left: 100
         };
-        var barchartWidth = document.getElementById("barChartContainer").clientWidth - barchartMargin.left - barchartMargin.right;
+        var barchartWidth = document.getElementById("barChartContainer").clientWidth * 0.95 - barchartMargin.left - barchartMargin.right;
         var barchartHeight = 600 - barchartMargin.top - barchartMargin.bottom;
         // if (screen.availWidth　 < 400) barchartHeight = 0.6 * $(".barChart").width() - barchartMargin.top - barchartMargin.bottom;
         // else barchartHeight = window.innerHeight - barchartMargin.top - barchartMargin.bottom;
@@ -785,9 +785,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
         barchartSvg.attr("width", barchartWidth + barchartMargin.left + barchartMargin.right)
             .attr("height", barchartHeight + barchartMargin.top + barchartMargin.bottom)
-            .append("g")
-            .attr("transform",
-                "translate(" + barchartMargin.left + "," + barchartMargin.top + ")");
+            .append("g");
 
         var barchartScaleX = d3.scale.ordinal().rangeRoundBands([0, barchartWidth], 0.1).domain(allKindOfRate[whichBtn].map(function (d) {
             return d.country;
@@ -814,6 +812,8 @@ d3.csv("./data/history.csv", function (tmpdata) {
             .data(allKindOfRate[whichBtn]);
 
         barRect.enter().append("rect")
+            .attr("transform",
+                "translate(" + barchartMargin.left + "," + barchartMargin.top + ")")
             .style("fill", (d, i) => {
                 if (d.changeValue > 0) {
                     return countryPosColor(i);
@@ -834,9 +834,10 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
         var originAxisX = barchartScaleY(0);
         var allTick = barchartSvg.append("g")
-            // .data(allKindOfRate[whichBtn])
+            .attr("transform",
+                "translate(" + barchartMargin.left + "," + (barchartMargin.top + barchartScaleY(0)) + ")")
             .attr("class", "barchartScaleXAxis")
-            .attr("transform", "translate(0," + barchartScaleY(0) + ")")
+            // .attr("transform", "translate(0," + barchartScaleY(0) + ")")
             .style("z-index", 100)
             .call(barchartScaleXAxis)
             .attr('fill', 'none')
@@ -849,7 +850,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
         allTick.selectAll('text')
             .data(allKindOfRate[whichBtn])
-
             .attr('stroke', 'none')
             .attr('fill', function (d) {
                 return axisColor;
@@ -884,6 +884,8 @@ d3.csv("./data/history.csv", function (tmpdata) {
             });
 
         barchartSvg.append("g")
+            .attr("transform",
+                "translate(" + barchartMargin.left + "," + barchartMargin.top + ")")
             .attr("class", "barchartScaleYAxis")
             .call(barchartScaleYAxis)
             .attr({
@@ -987,10 +989,14 @@ d3.csv("./data/history.csv", function (tmpdata) {
             var barRect2 = barchartSvg.selectAll(".barRect")
                 .data(allKindOfRate[whichBtn]);
 
-            barRect2.enter().append("rect");
+            barRect2.enter().append("rect")
+                .attr("transform",
+                    "translate(" + barchartMargin.left + "," + barchartMargin.top + ")");
 
             barRect2.transition()
                 .duration(dataChangingTime)
+                .attr("transform",
+                    "translate(" + barchartMargin.left + "," + barchartMargin.top + ")")
                 .style("fill", (d, i) => {
                     if (d.changeValue > 0) {
                         return countryPosColor(i);
@@ -1030,16 +1036,20 @@ d3.csv("./data/history.csv", function (tmpdata) {
             // x軸重新繪出
             d3.select(".barchartScaleXAxis").remove();
             allTick = barchartSvg.append("g")
+                .attr("transform",
+                    "translate(" + barchartMargin.left + "," + (barchartMargin.top + originAxisX) + ")")
                 .attr("class", "barchartScaleXAxis")
                 .attr({
                     'fill': 'none',
                     'stroke': axisColor //tick顏色
                 })
-                .attr("transform", "translate(0," + originAxisX + ")")
+                // .attr("transform", "translate(0," + originAxisX + ")")
                 .transition()
                 .duration(dataChangingTime)
                 .call(barchartScaleXAxis)
-                .attr("transform", "translate(0," + barchartScaleY(0) + ")");
+                .attr("transform",
+                    "translate(" + barchartMargin.left + "," + (barchartMargin.top + barchartScaleY(0)) + ")");
+            // .attr("transform", "translate(0," + barchartScaleY(0) + ")");
 
             originAxisX = barchartScaleY(0);
 
@@ -1083,11 +1093,12 @@ d3.csv("./data/history.csv", function (tmpdata) {
         linechartsvg.selectAll("path").remove();
         linechartsvg.selectAll("text").remove();
         linechartsvg.selectAll("line").remove();
+        linechartsvg.selectAll("circle").remove();
+    
         barchartSvg.selectAll("g").remove();
         barchartSvg.selectAll("rect").remove();
         barchartSvg.selectAll("text").remove();
 
-        console.log("in");
         draw();
     });
 

@@ -48,18 +48,16 @@ p {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    min-width: 250px;
-    max-width: 400px;
-
     margin-bottom:70px;
-    
+    max-width: 1200px;
 }
 
 .change-item button{
-    margin: 0px 10px;
-    min-width:250px;
-    min-height:70px;
-    max-height: 80px;
+    /* margin: 0px 10px; */
+    min-width:200px;
+    max-width:250px;
+    min-height:50px;
+    max-height: 70px;
     
     /* flex-basis: 100%; */
 }
