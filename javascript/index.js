@@ -96,7 +96,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 'width': linechartWidth + linechartMargin.left + linechartMargin.right,
                 'height': linechartHeight + linechartMargin.top + linechartMargin.bottom,
             }).style({
-                // 'border': '1px solid #000'
                 // 'background':rgba(170,170,170,0.15)
             })
             .attr('transform', 'translate(' + linechartMargin.left + ',' + linechartMargin.top + ')')
@@ -198,9 +197,9 @@ d3.csv("./data/history.csv", function (tmpdata) {
             linechartsvg.append("line") // attach a line
                 .style("stroke", function () {
                     if (i == 0) return lineColor1;
-                    if (i == 1) return lineColor2;
-                    if (i == 2) return lineColor3;
-                    if (i == 3) return lineColor4;
+                    else if (i == 1) return lineColor2;
+                    else if (i == 2) return lineColor3;
+                    else if (i == 3) return lineColor4;
 
                 })
                 .style("stroke-width", 2.5)
@@ -219,9 +218,9 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 })
                 .attr("fill", () => {
                     if (i == 0) return lineColor1;
-                    if (i == 1) return lineColor2;
-                    if (i == 2) return lineColor3;
-                    if (i == 3) return lineColor4;
+                    else if (i == 1) return lineColor2;
+                    else if (i == 2) return lineColor3;
+                    else if (i == 3) return lineColor4;
                 })
             linechartsvg.append("text")
                 .attr("x", function () {
@@ -230,18 +229,18 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 .attr("y", 0.3 * linechartMargin.top + 0.5 * linetextSize)
                 .text(function () {
                     if (i == 0) return "現金買入";
-                    if (i == 1) return "現金賣出";
-                    if (i == 2) return "即期買入";
-                    if (i == 3) return "即期賣出";
+                    else if (i == 1) return "現金賣出";
+                    else if (i == 2) return "即期買入";
+                    else if (i == 3) return "即期賣出";
                 })
                 .attr("text-anchor", "start")
                 .attr("font-family", "Noto Sans TC")
                 .attr("font-size", linetextSize + "px")
                 .attr("fill", () => {
                     if (i == 0) return lineColor1;
-                    if (i == 1) return lineColor2;
-                    if (i == 2) return lineColor3;
-                    if (i == 3) return lineColor4;
+                    else if (i == 1) return lineColor2;
+                    else if (i == 2) return lineColor3;
+                    else if (i == 3) return lineColor4;
                 });
         }
 
@@ -253,9 +252,9 @@ d3.csv("./data/history.csv", function (tmpdata) {
                     'd': lines[i](dividedCountryData[whichCountry]),
                     'stroke': function (d) {
                         if (i == 0) return lineColor1;
-                        if (i == 1) return lineColor2;
-                        if (i == 2) return lineColor3;
-                        if (i == 3) return lineColor4;
+                        else if (i == 1) return lineColor2;
+                        else if (i == 2) return lineColor3;
+                        else if (i == 3) return lineColor4;
                     },
                     'transform': 'translate(' + (linechartMargin.left) + ', ' + (linechartMargin.top) + ')', //用translate挑整axisX,axisY的位置
                     'fill': 'none'
@@ -322,7 +321,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
             .attr('x2', 0)
             .attr('y2', 0)
             .style('stroke', flexibleLineColor)
-            .style('stroke-width', 1)
+            .style('stroke-width', 4)
             .style('opacity', 0);
 
         //創造資料的圓點並繪出
@@ -337,7 +336,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 .append('g')
                 .append('circle')
                 .attr('class', function (d, i) {
-                    //console.log("dots" + i + " onLine" + j)
                     return "dots" + i + " onLine" + j;
                 })
                 .attr('cx', function (d) {
@@ -351,9 +349,9 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 })
                 .attr('fill', function (d) {
                     if (j == 0) return lineColor1;
-                    if (j == 1) return lineColor2;
-                    if (j == 2) return lineColor3;
-                    if (j == 3) return lineColor4;
+                    else if (j == 1) return lineColor2;
+                    else if (j == 2) return lineColor3;
+                    else if (j == 3) return lineColor4;
                 })
                 .attr('r', originR);
         }
@@ -397,7 +395,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
         //跟著滑鼠跑的那條線的Function
         var dotIsShining = 0; //判斷是否有某資料點正在閃爍
-        var shineDistance = 3;
+        var shineDistance = 7;
 
         function linechartMove(d, i) {
             if (dataIsChanging == 0) {
@@ -462,10 +460,10 @@ d3.csv("./data/history.csv", function (tmpdata) {
                                 })
                                 .text(function (d) {
                                     if (j == 0) return dividedCountryData[whichCountry][i].date + "(" + chineseCountryName[whichCountry] + dividedCountryData[whichCountry][i].country + ")";
-                                    if (j == 1) return "現金買入 : " + dividedCountryData[whichCountry][i].historyValue1 + "元";
-                                    if (j == 2) return "現金賣出 : " + dividedCountryData[whichCountry][i].historyValue2 + "元";
-                                    if (j == 3) return "即期買入 : " + dividedCountryData[whichCountry][i].historyValue3 + "元";
-                                    if (j == 4) return "即期賣出 : " + dividedCountryData[whichCountry][i].historyValue4 + "元";
+                                    else if (j == 1) return "現金買入 : " + dividedCountryData[whichCountry][i].historyValue1 + "元";
+                                    else if (j == 2) return "現金賣出 : " + dividedCountryData[whichCountry][i].historyValue2 + "元";
+                                    else if (j == 3) return "即期買入 : " + dividedCountryData[whichCountry][i].historyValue3 + "元";
+                                    else if (j == 4) return "即期賣出 : " + dividedCountryData[whichCountry][i].historyValue4 + "元";
                                 });
                         }
                     } else if (dotIsShining != 0) { //當有某資料點正在閃爍且滑鼠離該資料點的x軸距離大於10的時候
@@ -518,7 +516,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
         }
 
         // 為button做美化
-        // console.log(d3.selectAll(".menu"));
         d3.selectAll(".menu")
             .style("border", function (d, i) {
                 return "2px solid" + allCountryColor(i);
@@ -633,6 +630,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
         d3.selectAll(".menu")
             .on("click", function () {
                 //update active class
+
                 MenuActive = document.getElementsByClassName("menu active");
                 MenuActive[0].className = "menu";
                 this.className += " active ";
@@ -778,10 +776,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
         };
         var barchartWidth = document.getElementById("barChartContainer").clientWidth * 0.95 - barchartMargin.left - barchartMargin.right;
         var barchartHeight = 600 - barchartMargin.top - barchartMargin.bottom;
-        // if (screen.availWidth　 < 400) barchartHeight = 0.6 * $(".barChart").width() - barchartMargin.top - barchartMargin.bottom;
-        // else barchartHeight = window.innerHeight - barchartMargin.top - barchartMargin.bottom;
-        // $(".section2").width(window.availWidth);
-        // $(".section2").height(window.innerHeight);
 
         barchartSvg.attr("width", barchartWidth + barchartMargin.left + barchartMargin.right)
             .attr("height", barchartHeight + barchartMargin.top + barchartMargin.bottom)
@@ -807,6 +801,18 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 return parseFloat(parseFloat(d).toFixed(2)) + '%';
             });
 
+        var barchartTip = d3.tip()
+            .attr('class', 'barchart-d3-tip')
+            .offset([-10, 0])
+            .html(function (d) {
+                if (d.changeValue < 0)
+                    return d.country + " : <span style='color:#FF7777'>" + d.changeValue + "</span> %";
+                else
+                    return d.country + " : <span style='color:steelblue'>" + d.changeValue + "</span> %";
+            });
+
+        barchartSvg.call(barchartTip);
+
 
         var barRect = barchartSvg.selectAll(".barRect")
             .data(allKindOfRate[whichBtn]);
@@ -830,22 +836,21 @@ d3.csv("./data/history.csv", function (tmpdata) {
             })
             .attr("height", function (d) {
                 return Math.abs(barchartScaleY(d.changeValue) - barchartScaleY(0))
-            });
+            })
+            .on('mouseover', barchartTip.show)
+            .on('mouseout', barchartTip.hide);
 
         var originAxisX = barchartScaleY(0);
         var allTick = barchartSvg.append("g")
             .attr("transform",
                 "translate(" + barchartMargin.left + "," + (barchartMargin.top + barchartScaleY(0)) + ")")
             .attr("class", "barchartScaleXAxis")
-            // .attr("transform", "translate(0," + barchartScaleY(0) + ")")
             .style("z-index", 100)
             .call(barchartScaleXAxis)
             .attr('fill', 'none')
             .attr('stroke', function (d) {
                 //tick顏色
                 return axisColor;
-                // if (d.changeValue > 0) return deepColor1;
-                // else return deepColor2;
             });
 
         allTick.selectAll('text')
@@ -853,8 +858,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
             .attr('stroke', 'none')
             .attr('fill', function (d) {
                 return axisColor;
-                // if (d.changeValue > 0) return deepColor1;
-                // else return deepColor2;
             });
 
         var tickNegative = allTick.selectAll('.tick')
@@ -874,13 +877,9 @@ d3.csv("./data/history.csv", function (tmpdata) {
             .attr("dy", "-1.3em")
             .attr("stroke", function (d, i) {
                 return 'none';
-                // if (d.changeValue > 0) return deepColor1;
-                // else return deepColor2;
             })
             .attr("fill", function (d, i) {
                 return axisColor;
-                // if (d.changeValue > 0) return deepColor1;
-                // else return deepColor2;
             });
 
         barchartSvg.append("g")
@@ -890,12 +889,12 @@ d3.csv("./data/history.csv", function (tmpdata) {
             .call(barchartScaleYAxis)
             .attr({
                 'fill': 'none',
-                'stroke': axisColor //字體顏色
+                'stroke': axisColor
             })
             .selectAll("text")
             .attr({
                 'fill': axisColor,
-                'stroke': 'none' //字體顏色
+                'stroke': 'none'
             })
             .style("text-anchor", "end");
 
@@ -1024,12 +1023,12 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 .call(barchartScaleYAxis)
                 .attr({
                     'fill': 'none',
-                    'stroke': axisColor //字體顏色
+                    'stroke': axisColor
                 })
                 .selectAll("text")
                 .attr({
                     'fill': axisColor,
-                    'stroke': 'none' //字體顏色
+                    'stroke': 'none'
                 })
                 .style("text-anchor", "end");
 
@@ -1043,20 +1042,18 @@ d3.csv("./data/history.csv", function (tmpdata) {
                     'fill': 'none',
                     'stroke': axisColor //tick顏色
                 })
-                // .attr("transform", "translate(0," + originAxisX + ")")
                 .transition()
                 .duration(dataChangingTime)
                 .call(barchartScaleXAxis)
                 .attr("transform",
                     "translate(" + barchartMargin.left + "," + (barchartMargin.top + barchartScaleY(0)) + ")");
-            // .attr("transform", "translate(0," + barchartScaleY(0) + ")");
 
             originAxisX = barchartScaleY(0);
 
             allTick.selectAll("text")
                 .attr({
                     'fill': axisColor,
-                    'stroke': 'none' //Y軸字體顏色
+                    'stroke': 'none'
                 });
 
             tickNegative = allTick.selectAll('.tick')
@@ -1073,13 +1070,9 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 .attr("dy", "-1.3em")
                 .attr("stroke", function (d, i) {
                     return 'none';
-                    // if (d.changeValue > 0) return deepColor1;
-                    // else return deepColor2;
                 })
                 .attr("fill", function (d, i) {
                     return axisColor;
-                    // if (d.changeValue > 0) return deepColor1;
-                    // else return deepColor2;
                 });
 
         } //updateData2();
@@ -1094,7 +1087,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
         linechartsvg.selectAll("text").remove();
         linechartsvg.selectAll("line").remove();
         linechartsvg.selectAll("circle").remove();
-    
+
         barchartSvg.selectAll("g").remove();
         barchartSvg.selectAll("rect").remove();
         barchartSvg.selectAll("text").remove();
