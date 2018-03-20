@@ -10,98 +10,84 @@
 </head>
 
 <body>
-
-    <div>
-
-        <div id="mySidenav" class="sidenav">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-            <li>
-                <a class="menu active" id="btnUSD">美金 (USD)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnHKD">港幣 (HKD)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnGBP">英鎊 (GBP)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnAUD">澳幣 (AUD)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnCAD">加拿大幣 (CAD)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnSGD">新加坡幣 (SGD)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnCHF">瑞士法郎 (CHF)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnJPY">日圓 (JPY)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnZAR">南非幣 (ZAR)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnSEK">瑞典幣 (SEK)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnNZD">紐元 (NZD)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnTHB">泰幣 (THB)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnPHP">菲國比索 (PHP)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnIDR">印尼幣 (IDR)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnEUR">歐元 (EUR)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnKRW">韓元 (KRW)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnVND">越南盾 (VND)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnMYR">馬來幣 (MYR)</a>
-            </li>
-            <li>
-                <a class="menu" id="btnCNY">人民幣 (CNY)</a>
-            </li>
-        </div>
-
-        <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; 其他貨幣選擇</span>
-
-        <div class="row linechart">
-
+    <div class="flexbox-container">
+        <div class="flexbox-item-row">
+            <!-- <br> -->
+            <h2>臺灣銀行最近三個月之匯率走勢圖</h2>
+            <br>
+            <br>
         </div>
     </div>
 
-    <div class="section2">
-        <!-- <div class="row"> -->
-        <div class="item barChart">
+    <div class="flexbox-container">
+        <div class="flexbox-item-row" id="lineChartContainer">
+            <svg id="lineChart">
+            </svg>
         </div>
-        <div class="item barChart-btn">
-
-            <button id="button0" class="button active" style="vertical-align:middle">現金買入漲跌</button>
-            <button id="button1" class="button" style="vertical-align:middle">現金賣出漲跌</button>
-            <button id="button2" class="button" style="vertical-align:middle">即期買入漲跌</button>
-            <button id="button3" class="button" style="vertical-align:middle">即期賣出漲跌</button>
+        <div class="flexbox-item-row">
+            <h3>
+                點選按鈕觀看其他貨幣匯率
+            </h3>
+            <button class="menu active" id="btnUSD">美金 (USD)</button>
+            <button class="menu" id="btnHKD">港幣 (HKD)</button>
+            <button class="menu" id="btnGBP">英鎊 (GBP)</button>
+            <button class="menu" id="btnAUD">澳幣 (AUD)</button>
+            <button class="menu" id="btnCAD">加拿大幣 (CAD)</button>
+            <button class="menu" id="btnSGD">新加坡幣 (SGD)</button>
+            <button class="menu" id="btnCHF">瑞士法郎 (CHF)</button>
+            <button class="menu" id="btnJPY">日圓 (JPY)</button>
+            <button class="menu" id="btnZAR">南非幣 (ZAR)</button>
+            <button class="menu" id="btnSEK">瑞典幣 (SEK)</button>
+            <button class="menu" id="btnNZD">紐元 (NZD)</button>
+            <button class="menu" id="btnTHB">泰幣 (THB)</button>
+            <button class="menu" id="btnPHP">菲國比索 (PHP)</button>
+            <button class="menu" id="btnIDR">印尼幣 (IDR)</button>
+            <button class="menu" id="btnEUR">歐元 (EUR)</button>
+            <button class="menu" id="btnKRW">韓元 (KRW)</button>
+            <button class="menu" id="btnVND">越南盾 (VND)</button>
+            <button class="menu" id="btnMYR">馬來幣 (MYR)</button>
+            <button class="menu" id="btnCNY">人民幣 (CNY)</button>
         </div>
-        <!-- </div> -->
+    </div>
+    <br>
+    <br>
+    <br>
+    <hr>
+    <div class="flexbox-container">
+        <div class="flexbox-item-row">
+            <h3>
+                匯率漲跌圖
+            </h3>
+        </div>
+        <div class="flexbox-item-row" id="barChartContainer">
+            <svg id="barChart">
+            </svg>
+        </div>
+        <div class="flexbox-item-row">
+            <h3>
+                點選按鈕觀看其他牌告利率
+            </h3>
+        </div>
+        <div class="flexbox-item-row changebtn-div">
+            <div class="change-item">
+                <button id="button0" class="button active" style="vertical-align:middle">現金買入漲跌</button>
+            </div>
+            <div class="change-item">
+                <button id="button1" class="button" style="vertical-align:middle">現金賣出漲跌</button>
+            </div>
+            <div class="change-item">
+                <button id="button2" class="button" style="vertical-align:middle">即期買入漲跌</button>
+            </div>
+            <div class="change-item">
+                <button id="button3" class="button" style="vertical-align:middle">即期賣出漲跌</button>
+            </div>
+        </div>
     </div>
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="./javascript/d3.js"></script>
     <script type="text/javascript" src="./javascript/index.js"></script>
-    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script> -->
-    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> -->
 </body>
 
 </html>
