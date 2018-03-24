@@ -1,4 +1,8 @@
-﻿var allCountryName = [
+﻿// var today = new Date();　
+// d3.select("#date-info").html("上次更新日期 : " + today.getFullYear() + " 年 " + (today.getMonth() + 1) + " 月 " + today.getDate() + " 日" +
+//     "<br>" + today.getHours() + " 點 " + today.getMinutes() + " 分 ");
+
+var allCountryName = [
     'USD', 'HKD', 'GBP', 'AUD', 'CAD', 'SGD', 'CHF', 'JPY', 'ZAR', 'SEK',
     'NZD', 'THB', 'PHP', 'IDR', 'EUR', 'KRW', 'VND', 'MYR', 'CNY'
 ];
