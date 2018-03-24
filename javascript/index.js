@@ -2,9 +2,14 @@
     'USD', 'HKD', 'GBP', 'AUD', 'CAD', 'SGD', 'CHF', 'JPY', 'ZAR', 'SEK',
     'NZD', 'THB', 'PHP', 'IDR', 'EUR', 'KRW', 'VND', 'MYR', 'CNY'
 ];
+
 var chineseCountryName = [
     '美金', '港幣', '英鎊', '澳幣', '加拿大幣', '新加坡幣', '瑞士法郎', '日圓', '南非幣', '瑞典幣',
     '紐元', '泰幣', '菲國比索', '印尼幣', '歐元', '韓元', '越南盾', '馬來幣', '人民幣'
+];
+
+var barchartBtnName = [
+    '現金買入漲跌', '現金賣出漲跌', '即期買入漲跌', '即期賣出漲跌'
 ];
 
 var allCountryColor = d3.scale.category20b();
@@ -68,6 +73,13 @@ d3.csv("./data/history.csv", function (tmpdata) {
         var linechartWidth = document.getElementById("lineChartContainer").clientWidth - linechartMargin.left - linechartMargin.right;
         var linechartHeight = 500 - linechartMargin.top - linechartMargin.bottom;
 
+        var linechartXTextSize = linechartWidth / (16 * 5);
+        var linechartYTextSize = linechartMargin.left / 3;
+
+        d3.select("#linechart-title").html(function () {
+            return "目前選定 : " + chineseCountryName[whichCountry] + "<br>" + "點選按鈕觀看其他貨幣匯率";
+        });
+
         //define max and min value.
         var minX = d3.min(dividedCountryData[whichCountry], function (d) {
                 return parseInt(d.x)
@@ -124,7 +136,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
         //標明Y軸單位
         var yUnitText = linechartsvg.append("text")
             .attr("x", linechartMargin.left)
-            .attr("y", linechartMargin.top - 5)
+            .attr("y", linechartMargin.top - 15)
             .text(function (d) {
                 return "(元)";
             })
@@ -216,7 +228,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
                     if (linechartWidth < 400) return 3;
                     else return 5;
                 })
-                .attr("fill", () => {
+                .attr("fill", function () {
                     if (i == 0) return lineColor1;
                     else if (i == 1) return lineColor2;
                     else if (i == 2) return lineColor3;
@@ -236,7 +248,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 .attr("text-anchor", "start")
                 .attr("font-family", "Noto Sans TC")
                 .attr("font-size", linetextSize + "px")
-                .attr("fill", () => {
+                .attr("fill", function () {
                     if (i == 0) return lineColor1;
                     else if (i == 1) return lineColor2;
                     else if (i == 2) return lineColor3;
@@ -292,7 +304,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 'fill': '#000',
                 'stroke': 'none',
             }).style({
-                'font-size': '11px'
+                'font-size': linechartXTextSize
             });
         //繪出Y軸
         linechartsvg.append('g')
@@ -309,7 +321,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 'fill': '#000',
                 'stroke': 'none',
             }).style({
-                'font-size': '11px'
+                'font-size': linechartYTextSize
             });
 
         //繪出跟著滑鼠跑的線
@@ -528,7 +540,13 @@ d3.csv("./data/history.csv", function (tmpdata) {
         var dataChangingTime = 750;
 
         function updateData() {
+            d3.select("#linechart-title").html(function () {
+                return "目前選定 : " + chineseCountryName[whichCountry] + "<br>" + "點選按鈕觀看其他貨幣匯率";
+            });
             dataIsChanging = 1;
+
+            linechartYTextSize = (whichCountry == 13 || whichCountry == 15 || whichCountry == 16) ?
+                linechartMargin.left / 4 : linechartMargin.left / 3;
 
             //重新定義一些資料
             minX = d3.min(dividedCountryData[whichCountry], function (d) {
@@ -616,7 +634,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
                     'fill': '#000',
                     'stroke': 'none',
                 }).style({
-                    'font-size': '11px'
+                    'font-size': linechartYTextSize
                 });
 
             //當在更換資料時，不能進行其他mouseEvent
@@ -739,6 +757,10 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
         var allKindOfRate = [cashBuyChange, cashSellChange, sightBuyChange, sightSellChange];
 
+        d3.select("#barchart-title").html(function () {
+            return "目前選定 : " + barchartBtnName[whichBtn] + "<br>" + "點選按鈕觀看其他牌告利率";
+        });
+
         for (var i = 0; i < 4; ++i) {
             allKindOfRate[i].sort(function (x, y) {
                 return d3.descending(x.changeValue, y.changeValue);
@@ -820,7 +842,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
         barRect.enter().append("rect")
             .attr("transform",
                 "translate(" + barchartMargin.left + "," + barchartMargin.top + ")")
-            .style("fill", (d, i) => {
+            .style("fill", function (d, i) {
                 if (d.changeValue > 0) {
                     return countryPosColor(i);
                 } else return countryNegColor(i - PosNum + 1);
@@ -917,6 +939,11 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
         function updateData2() {
 
+
+            d3.select("#barchart-title").html(function () {
+                return "目前選定 : " + barchartBtnName[whichBtn] + "<br>" + "點選按鈕觀看其他牌告利率";
+            });
+
             PosNum = 0;
             NegNum = 0;
             for (var i = 0; i < allKindOfRate[whichBtn].length; ++i) {
@@ -955,13 +982,12 @@ d3.csv("./data/history.csv", function (tmpdata) {
                     return parseFloat(parseFloat(d).toFixed(2)) + '%';
                 });
 
-
             // 移除多餘的bar
             var barRect1 = barchartSvg.selectAll(".barRect")
                 .data(allKindOfRate[whichBtn]);
             barRect1.transition()
                 .duration(dataChangingTime)
-                .style("fill", (d, i) => {
+                .style("fill", function (d, i) {
                     if (d.changeValue > 0) {
                         return countryPosColor(i);
                     } else return countryNegColor(i - PosNum + 1);
@@ -996,7 +1022,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 .duration(dataChangingTime)
                 .attr("transform",
                     "translate(" + barchartMargin.left + "," + barchartMargin.top + ")")
-                .style("fill", (d, i) => {
+                .style("fill", function (d, i) {
                     if (d.changeValue > 0) {
                         return countryPosColor(i);
                     } else return countryNegColor(i - PosNum + 1);
