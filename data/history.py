@@ -14,7 +14,7 @@ allCountry2 = [
 ]
 
 
-fptr = open("data/history.csv","w",encoding = 'UTF-8')
+fptr = open("history.csv","w",encoding = 'UTF-8')
 fptr.write('x,country,date,historyValue1,historyValue2,historyValue3,historyValue4')
 fptr.write('\n')
 
