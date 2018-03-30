@@ -522,7 +522,7 @@ d3.csv("./data/history.csv", function (tmpdata) {
                         return 1;
                     })
                     .transition()
-                    .duration(10)
+                    .duration(5)
                     .attr('x1', mousePosOnLinechart[0])
                     .attr('y1', 0 + linechartMargin.top)
                     .attr('x2', mousePosOnLinechart[0])
