@@ -68,7 +68,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
     var linechartsvg = d3.select('#lineChart');
     var barchartSvg = d3.select("#barChart");
 
-
     function draw() {
         var whichCountry = 0;
 
@@ -87,9 +86,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
         dividedCountryData = entireDividedCountryData.slice();
 
-        console.log(linechartXTextSize);
-        console.log(linechartYTextSize);
-        
         if(linechartWidth < 1024){
             // 留部份資料
             if(linechartWidth > 400){
@@ -102,7 +98,8 @@ d3.csv("./data/history.csv", function (tmpdata) {
                     }            
                 }
             }else{
-                gridInterval = 5;            
+                gridInterval = 5;
+                // linechartMargin.right = 20;            
                 document.getElementById("page-title").innerHTML = "臺灣銀行歷史匯率-近"+ sliceNum2 + "筆資料走勢圖";
                 for(var i = 0 ; i < allCountryName.length ; ++i){
                     dividedCountryData[i] = dividedCountryData[i].slice(0,sliceNum2);
@@ -149,14 +146,9 @@ d3.csv("./data/history.csv", function (tmpdata) {
             .attr({
                 'width': linechartWidth + linechartMargin.left + linechartMargin.right,
                 'height': linechartHeight + linechartMargin.top + linechartMargin.bottom,
-            }).style({
-                // 'background':rgba(170,170,170,0.15)
             })
-            .attr('transform', 'translate(' + linechartMargin.left + ',' + linechartMargin.top + ')')
             .on("mousemove", linechartMove)
             .on("touchmove", linechartMove);
-
-
 
         //設定偏移範圍及縮放範圍
         var offsetX = linechartWidth / 10,
@@ -204,7 +196,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
 
         //設定座標系
-
         var axisX = d3.svg.axis()
             .scale(scaleX2)
             .orient("bottom") //用axis.orient 來定義座標文字的上下左右位置
@@ -569,13 +560,13 @@ d3.csv("./data/history.csv", function (tmpdata) {
         }
 
         // 為button做美化
-        d3.selectAll(".menu")
-            .style("border", function (d, i) {
-                return "2px solid" + allCountryColor(i);
-            })
-            .style("background-color", function (d, i) {
-                return allCountryColor(i);
-            });
+        // d3.selectAll(".menu")
+        //     .style("border", function (d, i) {
+        //         return "2px solid" + allCountryColor(i);
+        //     })
+        //     .style("background-color", function (d, i) {
+        //         return allCountryColor(i);
+        //     });
 
         //換資料
         var dataChangingTime = 750;
@@ -962,16 +953,16 @@ d3.csv("./data/history.csv", function (tmpdata) {
             .style("text-anchor", "end");
 
         var buttonActive2;
-        d3.selectAll(".button")
-            .style("background-color", function () {
-                return "orange";
-            })
+        d3.selectAll(".change-btn")
+            // .style("background-color", function () {
+            //     return "orange";
+            // })
             .on("click", function () {
                 for (var i = 0; i < 4; ++i) {
                     if (this.id.split("button")[1][0] == i) {
                         whichBtn = i;
-                        buttonActive2 = document.getElementsByClassName("button active");
-                        buttonActive2[0].className = "button";
+                        buttonActive2 = document.getElementsByClassName("change-btn active");
+                        buttonActive2[0].className = "change-btn";
                         this.className += " active ";
                     }
                 }

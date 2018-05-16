@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" href="./img/favicon.ico"/>
-    <link rel="bookmark" href="./img/favicon.ico"/>
+    <link rel="shortcut icon" href="./img/favicon.ico" />
+    <link rel="bookmark" href="./img/favicon.ico" />
     <meta name="author" content="王議偉">
     <meta name="citation_authors" content="王議偉">
     <meta name="description" content="臺灣銀行牌告匯率視覺化 Author: 王議偉">
@@ -20,53 +20,64 @@
 <body>
     <div class="flexbox-container">
         <div class="flexbox-item-row">
-            <h2 id = "page-title">臺灣銀行最近三個月之匯率走勢圖</h2>
+            <h2 id="page-title">臺灣銀行最近三個月之匯率走勢圖</h2>
         </div>
     </div>
-    <div class="flexbox-container">
-        <div class="flexbox-item-row">
-            <h4 id="date-info"></h4>
-        </div>
-    </div>
-
-    <div class="flexbox-container">
+    <div class="flexbox-container" id="linechart-container">
         <div class="flexbox-item-row" id="lineChartContainer">
             <svg id="lineChart">
             </svg>
         </div>
-        <div class="flexbox-item-row">
+        <div class="flexbox-item-row" id="country-btns">
             <h3 id="linechart-title">
                 點選按鈕觀看其他貨幣匯率
             </h3>
-            <button class="menu active" id="btnUSD">美金 (USD)</button>
-            <button class="menu" id="btnHKD">港幣 (HKD)</button>
-            <button class="menu" id="btnGBP">英鎊 (GBP)</button>
-            <button class="menu" id="btnAUD">澳幣 (AUD)</button>
-            <button class="menu" id="btnCAD">加拿大幣 (CAD)</button>
-            <button class="menu" id="btnSGD">新加坡幣 (SGD)</button>
-            <button class="menu" id="btnCHF">瑞士法郎 (CHF)</button>
-            <button class="menu" id="btnJPY">日圓 (JPY)</button>
-            <button class="menu" id="btnZAR">南非幣 (ZAR)</button>
-            <button class="menu" id="btnSEK">瑞典幣 (SEK)</button>
-            <button class="menu" id="btnNZD">紐元 (NZD)</button>
-            <button class="menu" id="btnTHB">泰幣 (THB)</button>
-            <button class="menu" id="btnPHP">菲國比索 (PHP)</button>
-            <button class="menu" id="btnIDR">印尼幣 (IDR)</button>
-            <button class="menu" id="btnEUR">歐元 (EUR)</button>
-            <button class="menu" id="btnKRW">韓元 (KRW)</button>
-            <button class="menu" id="btnVND">越南盾 (VND)</button>
-            <button class="menu" id="btnMYR">馬來幣 (MYR)</button>
-            <button class="menu" id="btnCNY">人民幣 (CNY)</button>
+            <button class="menu active" id="btnUSD">
+                <img class="btn-icon" src="./img/USD.jpg">美金 (USD)</button>
+            <button class="menu" id="btnHKD">
+                <img class="btn-icon" src="./img/HKD.jpg">港幣 (HKD)</button>
+            <button class="menu" id="btnGBP">
+                <img class="btn-icon" src="./img/GBP.jpg">英鎊 (GBP)</button>
+            <button class="menu" id="btnAUD">
+                <img class="btn-icon" src="./img/AUD.jpg">澳幣 (AUD)</button>
+            <button class="menu" id="btnCAD">
+                <img class="btn-icon" src="./img/CAD.jpg">加拿大幣 (CAD)</button>
+            <button class="menu" id="btnSGD">
+                <img class="btn-icon" src="./img/SGD.jpg">新加坡幣 (SGD)</button>
+            <button class="menu" id="btnCHF">
+                <img class="btn-icon" src="./img/CHF.jpg">瑞士法郎 (CHF)</button>
+            <button class="menu" id="btnJPY">
+                <img class="btn-icon" src="./img/JPY.jpg">日圓 (JPY)</button>
+            <button class="menu" id="btnZAR">
+                <img class="btn-icon" src="./img/ZAR.jpg">南非幣 (ZAR)</button>
+            <button class="menu" id="btnSEK">
+                <img class="btn-icon" src="./img/SEK.jpg">瑞典幣 (SEK)</button>
+            <button class="menu" id="btnNZD">
+                <img class="btn-icon" src="./img/NZD.jpg">紐元 (NZD)</button>
+            <button class="menu" id="btnTHB">
+                <img class="btn-icon" src="./img/THB.jpg">泰幣 (THB)</button>
+            <button class="menu" id="btnPHP">
+                <img class="btn-icon" src="./img/PHP.jpg">菲國比索 (PHP)</button>
+            <button class="menu" id="btnIDR">
+                <img class="btn-icon" src="./img/IDR.jpg">印尼幣 (IDR)</button>
+            <button class="menu" id="btnEUR">
+                <img class="btn-icon" src="./img/EUR.jpg">歐元 (EUR)</button>
+            <button class="menu" id="btnKRW">
+                <img class="btn-icon" src="./img/KRW.jpg">韓元 (KRW)</button>
+            <button class="menu" id="btnVND">
+                <img class="btn-icon" src="./img/VND.jpg">越南盾 (VND)</button>
+            <button class="menu" id="btnMYR">
+                <img class="btn-icon" src="./img/MYR.jpg">馬來幣 (MYR)</button>
+            <button class="menu" id="btnCNY">
+                <img class="btn-icon" src="./img/CNY.jpg">人民幣 (CNY)</button>
         </div>
     </div>
-    <br>
-    <br>
-    <br>
-    <hr>
-    <div class="flexbox-container">
+
+    <div class="flexbox-container" id="barchart-container">
         <div class="flexbox-item-row">
+            <hr>
             <h3>
-                匯率漲跌圖
+                匯率漲跌圖 (本次更新後與前次比較)
             </h3>
         </div>
         <div class="flexbox-item-row" id="barChartContainer">
@@ -80,16 +91,16 @@
         </div>
         <div class="flexbox-item-row changebtn-div">
             <div class="change-item">
-                <button id="button0" class="button active" style="vertical-align:middle">現金買入漲跌</button>
+                <button id="button0" class="change-btn active">現金買入漲跌</button>
             </div>
             <div class="change-item">
-                <button id="button1" class="button" style="vertical-align:middle">現金賣出漲跌</button>
+                <button id="button1" class="change-btn">現金賣出漲跌</button>
             </div>
             <div class="change-item">
-                <button id="button2" class="button" style="vertical-align:middle">即期買入漲跌</button>
+                <button id="button2" class="change-btn">即期買入漲跌</button>
             </div>
             <div class="change-item">
-                <button id="button3" class="button" style="vertical-align:middle">即期賣出漲跌</button>
+                <button id="button3" class="change-btn">即期賣出漲跌</button>
             </div>
         </div>
     </div>
