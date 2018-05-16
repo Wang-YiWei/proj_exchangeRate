@@ -29,6 +29,10 @@ for (var i = 0; i < allCountryName.length; ++i) {
 }
 
 var dataIsChanging = 0;
+var sliceNum = 30;
+var sliceNum2 = 15;
+var gridInterval = 10;
+
 d3.csv("./data/history.csv", function (tmpdata) {
     tmpdata.forEach(function (d) {
         d.x = parseInt(d.x, 10);
@@ -57,15 +61,15 @@ d3.csv("./data/history.csv", function (tmpdata) {
         }
     }
 
+    // 保留完整的資料
+    var entireDividedCountryData = dividedCountryData.slice();
 
-    //創造畫布
+    // 創造畫布
     var linechartsvg = d3.select('#lineChart');
     var barchartSvg = d3.select("#barChart");
 
 
     function draw() {
-
-
         var whichCountry = 0;
 
         var linechartMargin = {
@@ -78,7 +82,41 @@ d3.csv("./data/history.csv", function (tmpdata) {
         var linechartHeight = 500 - linechartMargin.top - linechartMargin.bottom;
 
         var linechartXTextSize = linechartWidth / (16 * 5);
+        if(linechartXTextSize < 12) linechartXTextSize = 12;
         var linechartYTextSize = linechartMargin.left / 3;
+
+        dividedCountryData = entireDividedCountryData.slice();
+
+        console.log(linechartXTextSize);
+        console.log(linechartYTextSize);
+        
+        if(linechartWidth < 1024){
+            // 留部份資料
+            if(linechartWidth > 400){
+                gridInterval = 10;                 
+                document.getElementById("page-title").innerHTML = "臺灣銀行歷史匯率-近"+ sliceNum + "筆資料走勢圖";
+                for(var i = 0 ; i < allCountryName.length ; ++i){
+                    dividedCountryData[i] = dividedCountryData[i].slice(0,sliceNum);
+                    for(var j = 0 ; j < dividedCountryData[i].length ; ++j){
+                        dividedCountryData[i][j].x -= dividedCountryData[i][sliceNum-1].x;
+                    }            
+                }
+            }else{
+                gridInterval = 5;            
+                document.getElementById("page-title").innerHTML = "臺灣銀行歷史匯率-近"+ sliceNum2 + "筆資料走勢圖";
+                for(var i = 0 ; i < allCountryName.length ; ++i){
+                    dividedCountryData[i] = dividedCountryData[i].slice(0,sliceNum2);
+                    for(var j = 0 ; j < dividedCountryData[i].length ; ++j){
+                        dividedCountryData[i][j].x -= dividedCountryData[i][sliceNum2-1].x;
+                    }            
+                }
+            }
+        }else{
+            // 畫布大於1024，完整資料
+            document.getElementById("page-title").innerHTML = "臺灣銀行最近三個月之匯率走勢圖";
+            dividedCountryData = entireDividedCountryData.slice();
+            gridInterval = 10;     
+        }
 
         d3.select("#linechart-title").html(function () {
             return "目前選定 : " + chineseCountryName[whichCountry] + "<br>" + "點選按鈕觀看其他貨幣匯率";
@@ -102,11 +140,11 @@ d3.csv("./data/history.csv", function (tmpdata) {
                 }
                 return d.historyValue2
             }); //value2 is always the highest
+        
+        var mindate = new Date(dividedCountryData[0][dividedCountryData[0].length - 1].date);
+        var maxdate = new Date(dividedCountryData[0][0].date);
 
-        var mindate = new Date(dividedCountryData[0][dividedCountryData[0].length - 1].date),
-            maxdate = new Date(dividedCountryData[0][0].date);
-
-
+    
         linechartsvg.data(dividedCountryData[whichCountry])
             .attr({
                 'width': linechartWidth + linechartMargin.left + linechartMargin.right,
@@ -166,7 +204,6 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
 
         //設定座標系
-        var gridInterval = 10;
 
         var axisX = d3.svg.axis()
             .scale(scaleX2)
@@ -1111,18 +1148,18 @@ d3.csv("./data/history.csv", function (tmpdata) {
 
     draw();
 
-    window.addEventListener("resize", function () {
-        linechartsvg.selectAll("g").remove();
-        linechartsvg.selectAll("path").remove();
-        linechartsvg.selectAll("text").remove();
-        linechartsvg.selectAll("line").remove();
-        linechartsvg.selectAll("circle").remove();
+    // window.addEventListener("resize", function () {
+    //     linechartsvg.selectAll("g").remove();
+    //     linechartsvg.selectAll("path").remove();
+    //     linechartsvg.selectAll("text").remove();
+    //     linechartsvg.selectAll("line").remove();
+    //     linechartsvg.selectAll("circle").remove();
 
-        barchartSvg.selectAll("g").remove();
-        barchartSvg.selectAll("rect").remove();
-        barchartSvg.selectAll("text").remove();
+    //     barchartSvg.selectAll("g").remove();
+    //     barchartSvg.selectAll("rect").remove();
+    //     barchartSvg.selectAll("text").remove();
 
-        draw();
-    });
+    //     draw();
+    // });
 
 }) //d3.csv
