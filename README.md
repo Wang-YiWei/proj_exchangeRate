@@ -7,3 +7,7 @@ Visualize the exchange rate of Taiwan Bank within three months.
 
 ### JavaScript library
 - [D3.js](https://d3js.org/)
+
+### Automatically Update Data
+- Crontab and python script 
+- - (testing : works well from 2018/03/30 to 2018/05/16 )
