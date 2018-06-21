@@ -10,4 +10,4 @@ Visualize the exchange rate of Taiwan Bank within three months.
 
 ### Automatically Update Data
 - Crontab and python script 
-- - (testing : works well from 2018/03/30 to 2018/05/16 )
+    - (testing : works well from 2018/03/30 to 2018/05/16 )
