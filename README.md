@@ -1,6 +1,6 @@
-# proj_exchangeRate
+# exchange-rate-visualization
 
-Visualize the exchange rate of Taiwan Bank within three months.
+Visualize the exchange rate of Taiwan Bank within last three months.
 
 ### Data
 - [Beautiful Soup with Python](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
